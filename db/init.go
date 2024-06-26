@@ -33,8 +33,12 @@ func InitDB() (*sql.DB, error) {
 }
 
 func TearDown(db *sql.DB) {
-	db.Exec("DROP TABLE IF EXISTS userclubinfo")
-	db.Exec("DROP TABLE IF EXISTS userinfo")
+	db.Exec("DROP TABLE IF EXISTS Role")
+	db.Exec("DROP TABLE IF EXISTS users")
+	db.Exec("DROP TABLE IF EXISTS Project")
+	db.Exec("DROP TABLE IF EXISTS ProjectComment")
+	db.Exec("DROP TABLE IF EXISTS AssignedProject")
+
 }
 
 func CreateUserTable(db *sql.DB) {
@@ -77,7 +81,7 @@ func CreateProjectTable(db *sql.DB) {
 		total_amount INTEGER, 
 		order_date DATE,
 		status BOOLEAN,
-		  user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
+		user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
 		fee INTEGER
 	);
 	`
