@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"errors"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -26,19 +25,34 @@ func InitDB() (*sql.DB, error) {
 	// Ping the database to verify connection
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	db.SetMaxOpenConns(5)
 	db.SetMaxIdleConns(10)
 
-	CreateRoleTable(db)
-	CreateUserTable(db)
-	CreateProjectTable(db)
-	CreateProjectComment(db)
-	CreateAssignedProject(db)
+	err = CreateRoleTable(db)
+	if err != nil {
+		return nil, err
+	}
+	
+	err = CreateUserTable(db)
+	if err != nil {
+		return nil, err
+	}
 
-	return db, nil
+	err = CreateProjectTable(db)
+	if err != nil {
+		return nil, err
+	}
+
+	err = CreateProjectComment(db)
+	if err != nil {
+		return nil, err
+	}
+	err = CreateAssignedProject(db)
+
+	return db, err
 }
 
 func TearDown(db *sql.DB) {
