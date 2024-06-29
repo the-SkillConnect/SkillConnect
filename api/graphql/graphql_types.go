@@ -12,8 +12,12 @@ type Input struct {
 	Variables     map[string]interface{} `json:"variables"`
 }
 
-// Define your database instance here (replace with actual implementation)
 var DbInstance db.Querier
+
+// Setter for DbInstance
+func SetDbInstance(instance db.Querier) {
+	DbInstance = instance
+}
 
 // User GraphQL type
 var UserType = graphql.NewObject(graphql.ObjectConfig{
@@ -25,7 +29,6 @@ var UserType = graphql.NewObject(graphql.ObjectConfig{
 		"firstname":   &graphql.Field{Type: graphql.String},
 		"surname":     &graphql.Field{Type: graphql.String},
 		"mobilePhone": &graphql.Field{Type: graphql.String},
-		"roleID":      &graphql.Field{Type: graphql.Int},
 	},
 })
 
@@ -38,6 +41,19 @@ var InsertUserInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		"firstname":   &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"surname":     &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"mobilePhone": &graphql.InputObjectFieldConfig{Type: graphql.String},
-		"roleID":      &graphql.InputObjectFieldConfig{Type: graphql.Int},
+	},
+})
+
+
+// Input type for updating a user
+var UpdateUserInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "UpdateUserInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"id":          &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
+		"email":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+		"password":    &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+		"firstname":   &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"surname":     &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"mobilePhone": &graphql.InputObjectFieldConfig{Type: graphql.String},
 	},
 })

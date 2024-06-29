@@ -33,11 +33,6 @@ type Projectcomment struct {
 	Text      sql.NullString `json:"text"`
 }
 
-type Role struct {
-	ID   int32  `json:"id"`
-	Type string `json:"type"`
-}
-
 type User struct {
 	ID          int32          `json:"id"`
 	Email       string         `json:"email"`
@@ -45,5 +40,4 @@ type User struct {
 	Firstname   sql.NullString `json:"firstname"`
 	Surname     sql.NullString `json:"surname"`
 	MobilePhone sql.NullString `json:"mobile_phone"`
-	RoleID      sql.NullInt32  `json:"role_id"`
 }

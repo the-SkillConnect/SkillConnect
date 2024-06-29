@@ -2,16 +2,16 @@
 DELETE FROM Users WHERE id = $1;
 -- name: UpdateUserByID :one
 UPDATE Users
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, role_id = $6
-WHERE id = $7
+SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5
+WHERE id = $6
 RETURNING id;
 -- name: GetUserByID :one
 SELECT * FROM Users WHERE id = $1;
 -- name: GetUsers :many
 SELECT * FROM Users;
 -- name: InsertUser :one
-INSERT INTO Users (email, password, firstname, surname, mobile_phone, role_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO Users (email, password, firstname, surname, mobile_phone)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id;
 
 
@@ -62,16 +62,4 @@ SELECT * FROM AssignedProject;
 INSERT INTO AssignedProject (user_id, project_id, issued)
 VALUES ($1, $2, $3)
 RETURNING user_id;
-
-
--- name: DeleteRoleByID :exec
-DELETE FROM Role WHERE id = $1; 
--- name: GetRoleByID :one
-SELECT * FROM Role WHERE id = $1;
--- name: GetRoles :many
-SELECT * FROM Role;
--- name: InsertRole :one
-INSERT INTO Role (type)
-VALUES ($1)
-RETURNING id;
 

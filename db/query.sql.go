@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 const deleteAssignedProjectByID = `-- name: DeleteAssignedProjectByID :exec
@@ -40,15 +39,6 @@ DELETE FROM Project WHERE id = $1
 
 func (q *Queries) DeleteProjectByID(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteProjectByID, id)
-	return err
-}
-
-const deleteRoleByID = `-- name: DeleteRoleByID :exec
-DELETE FROM Role WHERE id = $1
-`
-
-func (q *Queries) DeleteRoleByID(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteRoleByID, id)
 	return err
 }
 
@@ -177,46 +167,8 @@ func (q *Queries) GetProjects(ctx context.Context) ([]Project, error) {
 	return items, nil
 }
 
-const getRoleByID = `-- name: GetRoleByID :one
-SELECT id, type FROM Role WHERE id = $1
-`
-
-func (q *Queries) GetRoleByID(ctx context.Context, id int32) (Role, error) {
-	row := q.db.QueryRowContext(ctx, getRoleByID, id)
-	var i Role
-	err := row.Scan(&i.ID, &i.Type)
-	return i, err
-}
-
-const getRoles = `-- name: GetRoles :many
-SELECT id, type FROM Role
-`
-
-func (q *Queries) GetRoles(ctx context.Context) ([]Role, error) {
-	rows, err := q.db.QueryContext(ctx, getRoles)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Role
-	for rows.Next() {
-		var i Role
-		if err := rows.Scan(&i.ID, &i.Type); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password, firstname, surname, mobile_phone, role_id FROM Users WHERE id = $1
+SELECT id, email, password, firstname, surname, mobile_phone FROM Users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
@@ -229,13 +181,12 @@ func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
 		&i.Firstname,
 		&i.Surname,
 		&i.MobilePhone,
-		&i.RoleID,
 	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, email, password, firstname, surname, mobile_phone, role_id FROM Users
+SELECT id, email, password, firstname, surname, mobile_phone FROM Users
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
@@ -254,7 +205,6 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 			&i.Firstname,
 			&i.Surname,
 			&i.MobilePhone,
-			&i.RoleID,
 		); err != nil {
 			return nil, err
 		}
@@ -344,22 +294,9 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 	return id, err
 }
 
-const insertRole = `-- name: InsertRole :one
-INSERT INTO Role (type)
-VALUES ($1)
-RETURNING id
-`
-
-func (q *Queries) InsertRole(ctx context.Context, type_ string) (int32, error) {
-	row := q.db.QueryRowContext(ctx, insertRole, type_)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
-
 const insertUser = `-- name: InsertUser :one
-INSERT INTO Users (email, password, firstname, surname, mobile_phone, role_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO Users (email, password, firstname, surname, mobile_phone)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id
 `
 
@@ -369,22 +306,18 @@ type InsertUserParams struct {
 	Firstname   sql.NullString `json:"firstname"`
 	Surname     sql.NullString `json:"surname"`
 	MobilePhone sql.NullString `json:"mobile_phone"`
-	RoleID      sql.NullInt32  `json:"role_id"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int32, error) {
-	fmt.Println("here")
 	row := q.db.QueryRowContext(ctx, insertUser,
 		arg.Email,
 		arg.Password,
 		arg.Firstname,
 		arg.Surname,
 		arg.MobilePhone,
-		arg.RoleID,
 	)
 	var id int32
 	err := row.Scan(&id)
-	fmt.Println(err,id)
 	return id, err
 }
 
@@ -472,8 +405,8 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 
 const updateUserByID = `-- name: UpdateUserByID :one
 UPDATE Users
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, role_id = $6
-WHERE id = $7
+SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5
+WHERE id = $6
 RETURNING id
 `
 
@@ -483,7 +416,6 @@ type UpdateUserByIDParams struct {
 	Firstname   sql.NullString `json:"firstname"`
 	Surname     sql.NullString `json:"surname"`
 	MobilePhone sql.NullString `json:"mobile_phone"`
-	RoleID      sql.NullInt32  `json:"role_id"`
 	ID          int32          `json:"id"`
 }
 
@@ -494,7 +426,6 @@ func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) 
 		arg.Firstname,
 		arg.Surname,
 		arg.MobilePhone,
-		arg.RoleID,
 		arg.ID,
 	)
 	var id int32

@@ -5,7 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/graphql-go/graphql"
-	"github.com/the-SkillConnect/SkillConnect/api"
+
+	api "github.com/the-SkillConnect/SkillConnect/api/graphql"
 	"github.com/the-SkillConnect/SkillConnect/db"
 )
 
@@ -14,9 +15,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
 	instance := db.New(dbInstance)
-	api.DbInstance = instance
+	api.SetDbInstance(instance) // Initialize the database instance in the API package
+
 	// Create the schema
 	schemaConfig := graphql.SchemaConfig{
 		Query:    api.RootQuery,

@@ -4,13 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     firstname VARCHAR(100),
     surname VARCHAR(100),
-    mobile_phone VARCHAR(20) UNIQUE,
-    role_id INTEGER REFERENCES Role(id)
-);
-
-CREATE TABLE IF NOT EXISTS Role (
-    id SERIAL PRIMARY KEY,
-    type VARCHAR(50) UNIQUE NOT NULL
+    mobile_phone VARCHAR(20) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS Project (
