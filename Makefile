@@ -6,3 +6,6 @@ build:
 
 run: build
 	./bin/skillConnect
+	
+sqlc: 
+	sqlc generate

@@ -15,8 +15,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	instance := db.New(dbInstance)
-	api.SetDbInstance(instance) // Initialize the database instance in the API package
+	api.SetDbInstance(instance) 
 
 	// Create the schema
 	schemaConfig := graphql.SchemaConfig{
