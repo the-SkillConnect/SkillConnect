@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 const deleteAssignedProjectByID = `-- name: DeleteAssignedProjectByID :exec
@@ -372,6 +373,7 @@ type InsertUserParams struct {
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int32, error) {
+	fmt.Println("here")
 	row := q.db.QueryRowContext(ctx, insertUser,
 		arg.Email,
 		arg.Password,
@@ -382,6 +384,7 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int32, 
 	)
 	var id int32
 	err := row.Scan(&id)
+	fmt.Println(err,id)
 	return id, err
 }
 

@@ -35,7 +35,7 @@ func InitDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	err = CreateUserTable(db)
 	if err != nil {
 		return nil, err
