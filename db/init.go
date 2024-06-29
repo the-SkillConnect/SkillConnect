@@ -2,9 +2,17 @@ package db
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 
 	_ "github.com/lib/pq"
+)
+
+var (
+	ErrorCreateUserTable       = errors.New("could not create user table")
+	ErrorRoleTable             = errors.New("could not create Role table")
+	ErrorCreateProjectTable    = errors.New("could not project table")
+	ErrorCreateProjectComment  = errors.New("could not project comment table")
+	ErrorCreateAssignedProject = errors.New("could not project comment table")
 )
 
 func InitDB() (*sql.DB, error) {
@@ -17,19 +25,34 @@ func InitDB() (*sql.DB, error) {
 	// Ping the database to verify connection
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	db.SetMaxOpenConns(5)
 	db.SetMaxIdleConns(10)
 
-	CreateRoleTable(db)
-	CreateUserTable(db)
-	CreateProjectTable(db)
-	CreateProjectComment(db)
-	CreateAssignedProject(db)
+	err = CreateRoleTable(db)
+	if err != nil {
+		return nil, err
+	}
+	
+	err = CreateUserTable(db)
+	if err != nil {
+		return nil, err
+	}
 
-	return db, nil
+	err = CreateProjectTable(db)
+	if err != nil {
+		return nil, err
+	}
+
+	err = CreateProjectComment(db)
+	if err != nil {
+		return nil, err
+	}
+	err = CreateAssignedProject(db)
+
+	return db, err
 }
 
 func TearDown(db *sql.DB) {
@@ -41,7 +64,7 @@ func TearDown(db *sql.DB) {
 
 }
 
-func CreateUserTable(db *sql.DB) {
+func CreateUserTable(db *sql.DB) error {
 	createUserTable := `
 	CREATE TABLE IF NOT EXISTS users (
 		id SERIAL PRIMARY KEY,
@@ -55,11 +78,12 @@ func CreateUserTable(db *sql.DB) {
 	`
 	_, err := db.Exec(createUserTable)
 	if err != nil {
-		log.Fatal("Could not create user  table " + err.Error())
+		return errors.Join(ErrorCreateUserTable, err)
 	}
+	return nil
 }
 
-func CreateRoleTable(db *sql.DB) {
+func CreateRoleTable(db *sql.DB) error {
 	createRoleTable := `
 	CREATE TABLE IF NOT EXISTS Role (
 		id SERIAL PRIMARY KEY,
@@ -68,11 +92,12 @@ func CreateRoleTable(db *sql.DB) {
 	`
 	_, err := db.Exec(createRoleTable)
 	if err != nil {
-		log.Fatal("Could not create Role table " + err.Error())
+		return errors.Join(ErrorRoleTable, err)
 	}
+	return nil
 }
 
-func CreateProjectTable(db *sql.DB) {
+func CreateProjectTable(db *sql.DB) error {
 	createProjectTable := `
 	CREATE TABLE IF NOT EXISTS Project (
 		id SERIAL PRIMARY KEY,
@@ -87,11 +112,12 @@ func CreateProjectTable(db *sql.DB) {
 	`
 	_, err := db.Exec(createProjectTable)
 	if err != nil {
-		log.Fatal("Could not project table " + err.Error())
+		return errors.Join(ErrorCreateProjectTable, err)
 	}
+	return nil
 }
 
-func CreateProjectComment(db *sql.DB) {
+func CreateProjectComment(db *sql.DB) error {
 	createProjectComment := `
 	CREATE TABLE IF NOT EXISTS ProjectComment (
 		id SERIAL PRIMARY KEY,
@@ -104,11 +130,12 @@ func CreateProjectComment(db *sql.DB) {
 	`
 	_, err := db.Exec(createProjectComment)
 	if err != nil {
-		log.Fatal("Could not project comment table " + err.Error())
+		return errors.Join(ErrorCreateProjectComment, err)
 	}
+	return nil
 }
 
-func CreateAssignedProject(db *sql.DB) {
+func CreateAssignedProject(db *sql.DB) error {
 	createAssignedProject := `
 	CREATE TABLE IF NOT EXISTS AssignedProject (
 		user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
@@ -119,6 +146,7 @@ func CreateAssignedProject(db *sql.DB) {
 	`
 	_, err := db.Exec(createAssignedProject)
 	if err != nil {
-		log.Fatal("Could not project comment table " + err.Error())
+		return errors.Join(ErrorCreateAssignedProject, err)
 	}
+	return err
 }
