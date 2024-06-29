@@ -5,7 +5,6 @@ import (
 	"github.com/the-SkillConnect/SkillConnect/db"
 )
 
-
 func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 	resolver := NewResolver(dbInstance)
 
@@ -18,11 +17,22 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					Args: graphql.FieldConfigArgument{
 						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
-					Resolve: resolver.ResolveUser,
+					Resolve: resolver.ResolveGetUserByID,
 				},
 				"users": &graphql.Field{
 					Type:    graphql.NewList(UserType),
 					Resolve: resolver.ResolveGetUsers,
+				},
+				"project": &graphql.Field{
+					Type: graphql.NewList(ProjectType),
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+					},
+					Resolve: resolver.ResolveGetProjectByID,
+				},
+				"projects": &graphql.Field{
+					Type:    graphql.NewList(ProjectType),
+					Resolve: resolver.ResolveGetProjects,
 				},
 			},
 		}),
@@ -49,6 +59,13 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateUserInputType)},
 					},
 					Resolve: resolver.ResolveUpdateUser,
+				},
+				"insertProject": &graphql.Field{
+					Type: ProjectType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertProjectInputType)},
+					},
+					Resolve: resolver.ResolveInsertProject,
 				},
 			},
 		}),
