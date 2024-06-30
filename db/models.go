@@ -18,24 +18,19 @@ type Project struct {
 	ID          int32          `json:"id"`
 	Title       sql.NullString `json:"title"`
 	Description sql.NullString `json:"description"`
-	TotalAmount sql.NullInt32  `json:"total_amount"`
+	TotalAmount sql.NullString `json:"total_amount"`
 	OrderDate   sql.NullTime   `json:"order_date"`
 	Status      sql.NullBool   `json:"status"`
-	UserID      sql.NullInt32  `json:"user_id"`
-	Fee         sql.NullInt32  `json:"fee"`
+	UserID      int32          `json:"user_id"`
+	Fee         sql.NullString `json:"fee"`
 }
 
 type Projectcomment struct {
 	ID        int32          `json:"id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	ProjectID sql.NullInt32  `json:"project_id"`
+	UserID    int32          `json:"user_id"`
+	ProjectID int32          `json:"project_id"`
 	Date      sql.NullTime   `json:"date"`
 	Text      sql.NullString `json:"text"`
-}
-
-type Role struct {
-	ID   int32  `json:"id"`
-	Type string `json:"type"`
 }
 
 type User struct {
@@ -45,5 +40,4 @@ type User struct {
 	Firstname   sql.NullString `json:"firstname"`
 	Surname     sql.NullString `json:"surname"`
 	MobilePhone sql.NullString `json:"mobile_phone"`
-	RoleID      sql.NullInt32  `json:"role_id"`
 }

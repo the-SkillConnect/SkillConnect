@@ -4,31 +4,25 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     firstname VARCHAR(100),
     surname VARCHAR(100),
-    mobile_phone VARCHAR(20) UNIQUE,
-    role_id INTEGER REFERENCES Role(id)
-);
-
-CREATE TABLE IF NOT EXISTS Role (
-    id SERIAL PRIMARY KEY,
-    type VARCHAR(50) UNIQUE NOT NULL
+    mobile_phone VARCHAR(20) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS Project (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    total_amount INTEGER, 
-    order_date DATE,
+    total_amount NUMERIC(10,3), 
+    order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     status BOOLEAN,
-      user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
-    fee INTEGER
+    user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    fee NUMERIC(5,3)
 );
 
 CREATE TABLE IF NOT EXISTS ProjectComment (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES Users(id) ON DELETE SET NULL,
-    project_id INTEGER REFERENCES Project(id) ON DELETE CASCADE,
-    date TIMESTAMP,
+    user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE SET NULL,
+    project_id INTEGER NOT NULL REFERENCES Project(id) ON DELETE CASCADE,
+    date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     text TEXT
 );
 
