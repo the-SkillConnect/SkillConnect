@@ -9,11 +9,11 @@ import (
 )
 
 type Querier interface {
-	DeleteAssignedProjectByID(ctx context.Context, arg DeleteAssignedProjectByIDParams) error
+	DeleteAssignedProjectByID(ctx context.Context, projectID int32) error
 	DeleteCommentByID(ctx context.Context, id int32) error
 	DeleteProjectByID(ctx context.Context, id int32) error
 	DeleteUserByID(ctx context.Context, id int32) error
-	GetAssignedProjectByID(ctx context.Context, arg GetAssignedProjectByIDParams) (Assignedproject, error)
+	GetAssignedProjectByID(ctx context.Context, projectID int32) (Assignedproject, error)
 	GetAssignedProjects(ctx context.Context) ([]Assignedproject, error)
 	GetCommentByID(ctx context.Context, id int32) (Projectcomment, error)
 	GetProjectByID(ctx context.Context, id int32) (Project, error)

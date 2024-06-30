@@ -48,18 +48,18 @@ RETURNING id;
 
 
 -- name: DeleteAssignedProjectByID :exec
-DELETE FROM AssignedProject WHERE user_id = $1 AND project_id = $2;
+DELETE FROM AssignedProject WHERE project_id = $1;
 -- name: UpdateAssignedProjectByID :one
 UPDATE AssignedProject
-SET issued = $1
-WHERE user_id = $2 AND project_id = $3
-RETURNING user_id;
+SET issued = $1, user_id = $2 
+WHERE project_id = $3
+RETURNING project_id;
 -- name: GetAssignedProjectByID :one
-SELECT * FROM AssignedProject WHERE user_id = $1 AND project_id = $2;
+SELECT * FROM AssignedProject WHERE project_id = $1;
 -- name: GetAssignedProjects :many
 SELECT * FROM AssignedProject;
 -- name: InsertAssignedProject :one
 INSERT INTO AssignedProject (user_id, project_id, issued)
 VALUES ($1, $2, $3)
-RETURNING user_id;
+RETURNING project_id;
 

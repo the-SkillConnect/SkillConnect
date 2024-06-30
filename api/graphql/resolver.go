@@ -127,3 +127,49 @@ func (r *Resolver) ResolveGetUsers(params graphql.ResolveParams) (interface{}, e
 func (r *Resolver) ResolveGetProjects(params graphql.ResolveParams) (interface{}, error) {
 	return r.DbInstance.GetProjects(context.Background())
 }
+
+func (r *Resolver) ResolveGetAssignedProjectByID(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["project_id"].(int)
+	return r.DbInstance.GetAssignedProjectByID(context.Background(), int32(id))
+}
+func (r *Resolver) ResolveGetAssignedProjects(params graphql.ResolveParams) (interface{}, error) {
+	return r.DbInstance.GetAssignedProjects(context.Background())
+}
+
+func (r *Resolver) ResolveInsertAssignedProject(params graphql.ResolveParams) (interface{}, error) {
+
+	input := params.Args["input"].(map[string]interface{})
+	insertParams := db.InsertAssignedProjectParams{
+		UserID:    int32(input["user_id"].(int)),
+		ProjectID: int32(input["project_id"].(int)),
+		Issued:    sql.NullBool{Bool: input["issued"].(bool), Valid: input["issued"] != nil},
+	}
+	id, err := r.DbInstance.InsertAssignedProject(context.Background(), insertParams)
+	if err != nil {
+		return nil, err
+	}
+	return r.DbInstance.GetAssignedProjectByID(context.Background(), id)
+}
+
+func (r *Resolver) ResolveUpdateAssignedProject(params graphql.ResolveParams) (interface{}, error) {
+	input := params.Args["input"].(map[string]interface{})
+	updateParams := db.UpdateAssignedProjectByIDParams{
+		UserID:    int32(input["user_id"].(int)),
+		ProjectID: int32(input["project_id"].(int)),
+		Issued:    sql.NullBool{Bool: input["issued"].(bool), Valid: input["issued"] != nil},
+	}
+	_, err := r.DbInstance.UpdateAssignedProjectByID(context.Background(), updateParams)
+	if err != nil {
+		return nil, err
+	}
+	return r.DbInstance.GetAssignedProjectByID(context.Background(), updateParams.ProjectID)
+}
+
+func (r *Resolver) ResolveDeleteAssignedProject(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["project_id"].(int)
+	err := r.DbInstance.DeleteAssignedProjectByID(context.Background(), int32(id))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}

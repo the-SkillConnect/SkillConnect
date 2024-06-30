@@ -11,16 +11,11 @@ import (
 )
 
 const deleteAssignedProjectByID = `-- name: DeleteAssignedProjectByID :exec
-DELETE FROM AssignedProject WHERE user_id = $1 AND project_id = $2
+DELETE FROM AssignedProject WHERE project_id = $1
 `
 
-type DeleteAssignedProjectByIDParams struct {
-	UserID    int32 `json:"user_id"`
-	ProjectID int32 `json:"project_id"`
-}
-
-func (q *Queries) DeleteAssignedProjectByID(ctx context.Context, arg DeleteAssignedProjectByIDParams) error {
-	_, err := q.db.ExecContext(ctx, deleteAssignedProjectByID, arg.UserID, arg.ProjectID)
+func (q *Queries) DeleteAssignedProjectByID(ctx context.Context, projectID int32) error {
+	_, err := q.db.ExecContext(ctx, deleteAssignedProjectByID, projectID)
 	return err
 }
 
@@ -52,16 +47,11 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id int32) error {
 }
 
 const getAssignedProjectByID = `-- name: GetAssignedProjectByID :one
-SELECT user_id, project_id, issued FROM AssignedProject WHERE user_id = $1 AND project_id = $2
+SELECT user_id, project_id, issued FROM AssignedProject WHERE project_id = $1
 `
 
-type GetAssignedProjectByIDParams struct {
-	UserID    int32 `json:"user_id"`
-	ProjectID int32 `json:"project_id"`
-}
-
-func (q *Queries) GetAssignedProjectByID(ctx context.Context, arg GetAssignedProjectByIDParams) (Assignedproject, error) {
-	row := q.db.QueryRowContext(ctx, getAssignedProjectByID, arg.UserID, arg.ProjectID)
+func (q *Queries) GetAssignedProjectByID(ctx context.Context, projectID int32) (Assignedproject, error) {
+	row := q.db.QueryRowContext(ctx, getAssignedProjectByID, projectID)
 	var i Assignedproject
 	err := row.Scan(&i.UserID, &i.ProjectID, &i.Issued)
 	return i, err
@@ -222,7 +212,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 const insertAssignedProject = `-- name: InsertAssignedProject :one
 INSERT INTO AssignedProject (user_id, project_id, issued)
 VALUES ($1, $2, $3)
-RETURNING user_id
+RETURNING project_id
 `
 
 type InsertAssignedProjectParams struct {
@@ -233,9 +223,9 @@ type InsertAssignedProjectParams struct {
 
 func (q *Queries) InsertAssignedProject(ctx context.Context, arg InsertAssignedProjectParams) (int32, error) {
 	row := q.db.QueryRowContext(ctx, insertAssignedProject, arg.UserID, arg.ProjectID, arg.Issued)
-	var user_id int32
-	err := row.Scan(&user_id)
-	return user_id, err
+	var project_id int32
+	err := row.Scan(&project_id)
+	return project_id, err
 }
 
 const insertComment = `-- name: InsertComment :one
@@ -323,9 +313,9 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int32, 
 
 const updateAssignedProjectByID = `-- name: UpdateAssignedProjectByID :one
 UPDATE AssignedProject
-SET issued = $1
-WHERE user_id = $2 AND project_id = $3
-RETURNING user_id
+SET issued = $1, user_id = $2 
+WHERE project_id = $3
+RETURNING project_id
 `
 
 type UpdateAssignedProjectByIDParams struct {
@@ -336,9 +326,9 @@ type UpdateAssignedProjectByIDParams struct {
 
 func (q *Queries) UpdateAssignedProjectByID(ctx context.Context, arg UpdateAssignedProjectByIDParams) (int32, error) {
 	row := q.db.QueryRowContext(ctx, updateAssignedProjectByID, arg.Issued, arg.UserID, arg.ProjectID)
-	var user_id int32
-	err := row.Scan(&user_id)
-	return user_id, err
+	var project_id int32
+	err := row.Scan(&project_id)
+	return project_id, err
 }
 
 const updateCommentByID = `-- name: UpdateCommentByID :one
