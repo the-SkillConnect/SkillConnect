@@ -34,6 +34,17 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					Type:    graphql.NewList(ProjectType),
 					Resolve: resolver.ResolveGetProjects,
 				},
+				"assignedProject": &graphql.Field{
+					Type: AssignedProjectType,
+					Args: graphql.FieldConfigArgument{
+						"project_id": &graphql.ArgumentConfig{Type: graphql.Int},
+					},
+					Resolve: resolver.ResolveGetAssignedProjectByID,
+				},
+				"assignedProjects": &graphql.Field{
+					Type:    graphql.NewList(AssignedProjectType),
+					Resolve: resolver.ResolveGetAssignedProjects,
+				},
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
@@ -80,6 +91,27 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateProjectInputType)},
 					},
 					Resolve: resolver.ResolveUpdateProject,
+				},
+				"insertAssignedProject": &graphql.Field{
+					Type: AssignedProjectType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertAssignedProjectInputType)},
+					},
+					Resolve: resolver.ResolveInsertAssignedProject,
+				},
+				"deleteAssignedProject": &graphql.Field{
+					Type: graphql.Boolean,
+					Args: graphql.FieldConfigArgument{
+						"project_id": &graphql.ArgumentConfig{Type: graphql.Int},
+					},
+					Resolve: resolver.ResolveDeleteAssignedProject,
+				},
+				"updateAssignedProject": &graphql.Field{
+					Type: AssignedProjectType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateAssignedProjectInputType)},
+					},
+					Resolve: resolver.ResolveUpdateAssignedProject,
 				},
 				"insertProjectComment": &graphql.Field{
 					Type: ProjectCommentType,

@@ -84,6 +84,33 @@ var UpdateProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	},
 })
 
+var AssignedProjectType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "AssignedProject",
+	Fields: graphql.Fields{
+		"user_id":    &graphql.Field{Type: graphql.Int},
+		"project_id": &graphql.Field{Type: graphql.Int},
+		"issued":     &graphql.Field{Type: graphql.Boolean},
+	},
+})
+
+var InsertAssignedProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "InsertAssignedProjectInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"user_id":    &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"project_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"issued":     &graphql.InputObjectFieldConfig{Type: graphql.Boolean},
+	},
+})
+
+var UpdateAssignedProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "UpdateAssignedProjectInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"user_id":    &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"project_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"issued":     &graphql.InputObjectFieldConfig{Type: graphql.Boolean},
+	},
+})
+
 var CommentType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Project",
 	Fields: graphql.Fields{
