@@ -75,6 +75,14 @@ func (r *Resolver) ResolveDeleteUser(params graphql.ResolveParams) (interface{},
 	}
 	return true, nil
 }
+func (r *Resolver) ResolveDeleteProject(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int)
+	err := r.DbInstance.DeleteProjectByID(context.Background(), int32(id))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 func (r *Resolver) ResolveUpdateUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
@@ -91,6 +99,25 @@ func (r *Resolver) ResolveUpdateUser(params graphql.ResolveParams) (interface{},
 		return nil, err
 	}
 	return r.DbInstance.GetUserByID(context.Background(), updateParams.ID)
+}
+
+func (r *Resolver) ResolveUpdateProject(params graphql.ResolveParams) (interface{}, error) {
+	input := params.Args["input"].(map[string]interface{})
+	updateParams := db.UpdateProjectByIDParams{
+		ID:          int32(input["id"].(int)),
+		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
+		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
+		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
+		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
+		OrderDate:   sql.NullTime{Time: time.Now(), Valid: true},
+		UserID:      int32(input["user_id"].(int)),
+		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
+	}
+	_, err := r.DbInstance.UpdateProjectByID(context.Background(), updateParams)
+	if err != nil {
+		return nil, err
+	}
+	return r.DbInstance.GetProjectByID(context.Background(), updateParams.ID)
 }
 
 func (r *Resolver) ResolveGetUsers(params graphql.ResolveParams) (interface{}, error) {

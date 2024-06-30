@@ -67,6 +67,20 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveInsertProject,
 				},
+				"deleteProject": &graphql.Field{
+					Type: graphql.Boolean,
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+					},
+					Resolve: resolver.ResolveDeleteProject,
+				},
+				"updateProject": &graphql.Field{
+					Type: ProjectType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateProjectInputType)},
+					},
+					Resolve: resolver.ResolveUpdateProject,
+				},
 			},
 		}),
 	})

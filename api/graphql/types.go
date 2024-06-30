@@ -60,10 +60,21 @@ var ProjectType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Input type for inserting a project
 var InsertProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InsertProjectInput",
 	Fields: graphql.InputObjectConfigFieldMap{
+		"title":        &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"description":  &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"total_amount": &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"status":       &graphql.InputObjectFieldConfig{Type: graphql.Boolean},
+		"user_id":      &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"fee":          &graphql.InputObjectFieldConfig{Type: graphql.String},
+	},
+})
+var UpdateProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "UpdateProjectInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"id":           &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"title":        &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"description":  &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"total_amount": &graphql.InputObjectFieldConfig{Type: graphql.String},
