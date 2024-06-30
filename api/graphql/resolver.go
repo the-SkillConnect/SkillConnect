@@ -50,11 +50,11 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 	insertParams := db.InsertProjectParams{
 		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
 		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
-		TotalAmount: sql.NullInt32{Int32: input["total_amount"].(int32), Valid: input["total_amount"] != nil},
+		TotalAmount: sql.NullInt32{Int32: int32(input["total_amount"].(int)), Valid: input["total_amount"] != nil},
 		OrderDate:   sql.NullTime{Time: input["order_date"].(time.Time), Valid: input["order_date"] != nil},
 		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		UserID:      sql.NullInt32{Int32: input["user_id"].(int32), Valid: input["user_id"] != nil},
-		Fee:         sql.NullInt32{Int32: input["fee"].(int32), Valid: input["fee"] != nil},
+		UserID:      sql.NullInt32{Int32: int32(input["user_id"].(int)), Valid: input["user_id"] != nil},
+		Fee:         sql.NullInt32{Int32: int32(input["fee"].(int)), Valid: input["fee"] != nil},
 	}
 	id, err := r.DbInstance.InsertProject(context.Background(), insertParams)
 	if err != nil {
