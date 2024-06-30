@@ -29,6 +29,15 @@ func (r *Resolver) ResolveGetProjectByID(params graphql.ResolveParams) (interfac
 	id := params.Args["id"].(int)
 	return r.DbInstance.GetProjectByID(context.Background(), int32(id))
 }
+func (r *Resolver) ResolveGetProjectCommentByID(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int)
+	return r.DbInstance.GetProjectCommentByID(context.Background(), int32(id))
+}
+
+func (r *Resolver) ResolveGetProjectCommentsByProjectID(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["project_id"].(int)
+	return r.DbInstance.GetProjectCommentsByProjectID(context.Background(), int32(id))
+}
 
 func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
@@ -67,6 +76,22 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 	return r.DbInstance.GetProjectByID(context.Background(), id)
 }
 
+func (r *Resolver) ResolveInsertProjectComment(params graphql.ResolveParams) (interface{}, error) {
+	input := params.Args["input"].(map[string]interface{})
+	insertParams := db.InsertProjectCommentParams{
+		UserID:    int32(input["user_id"].(int)),
+		ProjectID: int32(input["project_id"].(int)),
+		Date:      sql.NullTime{Time: time.Now(), Valid: true},
+		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
+	}
+	fmt.Printf("%+v\n", insertParams)
+	id, err := r.DbInstance.InsertProjectComment(context.Background(), insertParams)
+	if err != nil {
+		return nil, err
+	}
+	return r.DbInstance.GetProjectCommentByID(context.Background(), id)
+}
+
 func (r *Resolver) ResolveDeleteUser(params graphql.ResolveParams) (interface{}, error) {
 	id := params.Args["id"].(int)
 	err := r.DbInstance.DeleteUserByID(context.Background(), int32(id))
@@ -78,6 +103,14 @@ func (r *Resolver) ResolveDeleteUser(params graphql.ResolveParams) (interface{},
 func (r *Resolver) ResolveDeleteProject(params graphql.ResolveParams) (interface{}, error) {
 	id := params.Args["id"].(int)
 	err := r.DbInstance.DeleteProjectByID(context.Background(), int32(id))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+func (r *Resolver) ResolveDeleteProjectComment(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int)
+	err := r.DbInstance.DeleteProjectCommentByID(context.Background(), int32(id))
 	if err != nil {
 		return false, err
 	}
@@ -118,6 +151,31 @@ func (r *Resolver) ResolveUpdateProject(params graphql.ResolveParams) (interface
 		return nil, err
 	}
 	return r.DbInstance.GetProjectByID(context.Background(), updateParams.ID)
+}
+
+// type UpdateProjectCommentByIDParams struct {
+// 	UserID    sql.NullInt32  `json:"user_id"`
+// 	ProjectID sql.NullInt32  `json:"project_id"`
+// 	Date      sql.NullTime   `json:"date"`
+// 	Text      sql.NullString `json:"text"`
+// 	ID        int32          `json:"id"`
+// }
+
+func (r *Resolver) ResolveUpdateProjectComment(params graphql.ResolveParams) (interface{}, error) {
+	input := params.Args["input"].(map[string]interface{})
+	updateParams := db.UpdateProjectCommentByIDParams{
+		ID:        int32(input["id"].(int)),
+		UserID:    int32(input["user_id"].(int)),
+		ProjectID: int32(input["project_id"].(int)),
+		Date:      sql.NullTime{Time: time.Now(), Valid: true},
+		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
+	}
+	fmt.Printf("%+v\n", updateParams)
+	_, err := r.DbInstance.UpdateProjectCommentByID(context.Background(), updateParams)
+	if err != nil {
+		return nil, err
+	}
+	return r.DbInstance.GetProjectCommentByID(context.Background(), updateParams.ID)
 }
 
 func (r *Resolver) ResolveGetUsers(params graphql.ResolveParams) (interface{}, error) {

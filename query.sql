@@ -15,16 +15,18 @@ VALUES ($1, $2, $3, $4, $5)
 RETURNING id;
 
 
--- name: DeleteCommentByID :exec
+-- name: DeleteProjectCommentByID :exec
 DELETE FROM ProjectComment WHERE id = $1;
--- name: UpdateCommentByID :one
+-- name: UpdateProjectCommentByID :one
 UPDATE ProjectComment
 SET user_id = $1, project_id = $2, date = $3, text = $4
 WHERE id = $5
 RETURNING id;
--- name: GetCommentByID :one
+-- name: GetProjectCommentByID :one
 SELECT * FROM ProjectComment WHERE id = $1;
--- name: InsertComment :one
+-- name: GetProjectCommentsByProjectID :many
+SELECT * FROM ProjectComment WHERE project_id = $1;
+-- name: InsertProjectComment :one
 INSERT INTO ProjectComment (user_id, project_id, date, text)
 VALUES ($1, $2, $3, $4)
 RETURNING id;

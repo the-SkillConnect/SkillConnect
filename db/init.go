@@ -102,9 +102,9 @@ func CreateProjectComment(db *sql.DB) error {
 	createProjectComment := `
 	CREATE TABLE IF NOT EXISTS ProjectComment (
 		id SERIAL PRIMARY KEY,
-		user_id INTEGER REFERENCES Users(id) ON DELETE SET NULL,
-		project_id INTEGER REFERENCES Project(id) ON DELETE CASCADE,
-		date TIMESTAMP,
+		user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE SET NULL,
+		project_id INTEGER NOT NULL REFERENCES Project(id) ON DELETE CASCADE,
+		date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		text TEXT
 	);
 	`

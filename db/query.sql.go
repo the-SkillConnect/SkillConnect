@@ -24,21 +24,21 @@ func (q *Queries) DeleteAssignedProjectByID(ctx context.Context, arg DeleteAssig
 	return err
 }
 
-const deleteCommentByID = `-- name: DeleteCommentByID :exec
-DELETE FROM ProjectComment WHERE id = $1
-`
-
-func (q *Queries) DeleteCommentByID(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteCommentByID, id)
-	return err
-}
-
 const deleteProjectByID = `-- name: DeleteProjectByID :exec
 DELETE FROM Project WHERE id = $1
 `
 
 func (q *Queries) DeleteProjectByID(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteProjectByID, id)
+	return err
+}
+
+const deleteProjectCommentByID = `-- name: DeleteProjectCommentByID :exec
+DELETE FROM ProjectComment WHERE id = $1
+`
+
+func (q *Queries) DeleteProjectCommentByID(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteProjectCommentByID, id)
 	return err
 }
 
@@ -94,23 +94,6 @@ func (q *Queries) GetAssignedProjects(ctx context.Context) ([]Assignedproject, e
 	return items, nil
 }
 
-const getCommentByID = `-- name: GetCommentByID :one
-SELECT id, user_id, project_id, date, text FROM ProjectComment WHERE id = $1
-`
-
-func (q *Queries) GetCommentByID(ctx context.Context, id int32) (Projectcomment, error) {
-	row := q.db.QueryRowContext(ctx, getCommentByID, id)
-	var i Projectcomment
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.ProjectID,
-		&i.Date,
-		&i.Text,
-	)
-	return i, err
-}
-
 const getProjectByID = `-- name: GetProjectByID :one
 SELECT id, title, description, total_amount, order_date, status, user_id, fee FROM Project WHERE id = $1
 `
@@ -129,6 +112,56 @@ func (q *Queries) GetProjectByID(ctx context.Context, id int32) (Project, error)
 		&i.Fee,
 	)
 	return i, err
+}
+
+const getProjectCommentByID = `-- name: GetProjectCommentByID :one
+SELECT id, user_id, project_id, date, text FROM ProjectComment WHERE id = $1
+`
+
+func (q *Queries) GetProjectCommentByID(ctx context.Context, id int32) (Projectcomment, error) {
+	row := q.db.QueryRowContext(ctx, getProjectCommentByID, id)
+	var i Projectcomment
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ProjectID,
+		&i.Date,
+		&i.Text,
+	)
+	return i, err
+}
+
+const getProjectCommentsByProjectID = `-- name: GetProjectCommentsByProjectID :many
+SELECT id, user_id, project_id, date, text FROM ProjectComment WHERE project_id = $1
+`
+
+func (q *Queries) GetProjectCommentsByProjectID(ctx context.Context, projectID int32) ([]Projectcomment, error) {
+	rows, err := q.db.QueryContext(ctx, getProjectCommentsByProjectID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Projectcomment
+	for rows.Next() {
+		var i Projectcomment
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ProjectID,
+			&i.Date,
+			&i.Text,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getProjects = `-- name: GetProjects :many
@@ -238,31 +271,6 @@ func (q *Queries) InsertAssignedProject(ctx context.Context, arg InsertAssignedP
 	return user_id, err
 }
 
-const insertComment = `-- name: InsertComment :one
-INSERT INTO ProjectComment (user_id, project_id, date, text)
-VALUES ($1, $2, $3, $4)
-RETURNING id
-`
-
-type InsertCommentParams struct {
-	UserID    sql.NullInt32  `json:"user_id"`
-	ProjectID sql.NullInt32  `json:"project_id"`
-	Date      sql.NullTime   `json:"date"`
-	Text      sql.NullString `json:"text"`
-}
-
-func (q *Queries) InsertComment(ctx context.Context, arg InsertCommentParams) (int32, error) {
-	row := q.db.QueryRowContext(ctx, insertComment,
-		arg.UserID,
-		arg.ProjectID,
-		arg.Date,
-		arg.Text,
-	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
-
 const insertProject = `-- name: InsertProject :one
 INSERT INTO Project (title, description, total_amount, status, user_id, fee, order_date)
 VALUES ($1, $2, $3, $4, $5, $6,$7)
@@ -288,6 +296,31 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 		arg.UserID,
 		arg.Fee,
 		arg.OrderDate,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const insertProjectComment = `-- name: InsertProjectComment :one
+INSERT INTO ProjectComment (user_id, project_id, date, text)
+VALUES ($1, $2, $3, $4)
+RETURNING id
+`
+
+type InsertProjectCommentParams struct {
+	UserID    int32          `json:"user_id"`
+	ProjectID int32          `json:"project_id"`
+	Date      sql.NullTime   `json:"date"`
+	Text      sql.NullString `json:"text"`
+}
+
+func (q *Queries) InsertProjectComment(ctx context.Context, arg InsertProjectCommentParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, insertProjectComment,
+		arg.UserID,
+		arg.ProjectID,
+		arg.Date,
+		arg.Text,
 	)
 	var id int32
 	err := row.Scan(&id)
@@ -341,34 +374,6 @@ func (q *Queries) UpdateAssignedProjectByID(ctx context.Context, arg UpdateAssig
 	return user_id, err
 }
 
-const updateCommentByID = `-- name: UpdateCommentByID :one
-UPDATE ProjectComment
-SET user_id = $1, project_id = $2, date = $3, text = $4
-WHERE id = $5
-RETURNING id
-`
-
-type UpdateCommentByIDParams struct {
-	UserID    sql.NullInt32  `json:"user_id"`
-	ProjectID sql.NullInt32  `json:"project_id"`
-	Date      sql.NullTime   `json:"date"`
-	Text      sql.NullString `json:"text"`
-	ID        int32          `json:"id"`
-}
-
-func (q *Queries) UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDParams) (int32, error) {
-	row := q.db.QueryRowContext(ctx, updateCommentByID,
-		arg.UserID,
-		arg.ProjectID,
-		arg.Date,
-		arg.Text,
-		arg.ID,
-	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
-}
-
 const updateProjectByID = `-- name: UpdateProjectByID :one
 UPDATE Project
 SET title = $1, description = $2, total_amount = $3, status = $4, user_id = $5, fee = $6, order_date = $7
@@ -396,6 +401,34 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 		arg.UserID,
 		arg.Fee,
 		arg.OrderDate,
+		arg.ID,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const updateProjectCommentByID = `-- name: UpdateProjectCommentByID :one
+UPDATE ProjectComment
+SET user_id = $1, project_id = $2, date = $3, text = $4
+WHERE id = $5
+RETURNING id
+`
+
+type UpdateProjectCommentByIDParams struct {
+	UserID    int32          `json:"user_id"`
+	ProjectID int32          `json:"project_id"`
+	Date      sql.NullTime   `json:"date"`
+	Text      sql.NullString `json:"text"`
+	ID        int32          `json:"id"`
+}
+
+func (q *Queries) UpdateProjectCommentByID(ctx context.Context, arg UpdateProjectCommentByIDParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, updateProjectCommentByID,
+		arg.UserID,
+		arg.ProjectID,
+		arg.Date,
+		arg.Text,
 		arg.ID,
 	)
 	var id int32

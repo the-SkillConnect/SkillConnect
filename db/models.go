@@ -27,8 +27,8 @@ type Project struct {
 
 type Projectcomment struct {
 	ID        int32          `json:"id"`
-	UserID    sql.NullInt32  `json:"user_id"`
-	ProjectID sql.NullInt32  `json:"project_id"`
+	UserID    int32          `json:"user_id"`
+	ProjectID int32          `json:"project_id"`
 	Date      sql.NullTime   `json:"date"`
 	Text      sql.NullString `json:"text"`
 }

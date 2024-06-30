@@ -83,3 +83,47 @@ var UpdateProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		"fee":          &graphql.InputObjectFieldConfig{Type: graphql.String},
 	},
 })
+
+var CommentType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Project",
+	Fields: graphql.Fields{
+		"id":           &graphql.Field{Type: graphql.Int},
+		"title":        &graphql.Field{Type: graphql.String},
+		"description":  &graphql.Field{Type: graphql.String},
+		"total_amount": &graphql.Field{Type: graphql.String},
+		"orderDate":    &graphql.Field{Type: graphql.String},
+		"status":       &graphql.Field{Type: graphql.Boolean},
+		"user_id":      &graphql.Field{Type: graphql.Int},
+		"fee":          &graphql.Field{Type: graphql.String},
+	},
+})
+
+var ProjectCommentType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "ProjectComment",
+	Fields: graphql.Fields{
+		"id":         &graphql.Field{Type: graphql.Int},
+		"user_id":    &graphql.Field{Type: graphql.Int},
+		"project_id": &graphql.Field{Type: graphql.Int},
+		"date":       &graphql.Field{Type: graphql.String},
+		"text":       &graphql.Field{Type: graphql.String},
+	},
+})
+
+var InsertProjectCommentInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "InsertProjectCommentInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"user_id":    &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"project_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"text":       &graphql.InputObjectFieldConfig{Type: graphql.String},
+	},
+})
+
+var UpdateProjectCommentInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "UpdateProjectCommentInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"id":         &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
+		"user_id":    &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"project_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"text":       &graphql.InputObjectFieldConfig{Type: graphql.String},
+	},
+})

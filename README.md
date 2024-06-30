@@ -46,3 +46,28 @@ curl -X POST \
   http://localhost:8585/graphql
 
 ```
+
+## Insert a project comment
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation InsertProjectComment { insertProjectComment(input: { user_id: 1, project_id: 1, text: \"1635115\" }) { date id project_id text user_id } }"
+  }' \
+  http://localhost:8585/graphql
+
+```
+
+## Update a project comment:
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation UpdateProjectComment { updateProjectComment(input: { text: \"bad text is here\", id: 5, user_id: 4, project_id: 2 }) { email firstname id mobilePhone password surname } }"
+  }' \
+  http://localhost:8585/graphql
+
+
+```
