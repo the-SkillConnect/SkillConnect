@@ -34,16 +34,16 @@ RETURNING id;
 DELETE FROM Project WHERE id = $1;
 -- name: UpdateProjectByID :one
 UPDATE Project
-SET title = $1, description = $2, total_amount = $3, order_date = $4, status = $5, user_id = $6, fee = $7
-WHERE id = $8
+SET title = $1, description = $2, total_amount = $3, status = $4, user_id = $5, fee = $6
+WHERE id = $7
 RETURNING id;
 -- name: GetProjectByID :one
 SELECT * FROM Project WHERE id = $1;
 -- name: GetProjects :many
 SELECT * FROM Project;
 -- name: InsertProject :one
-INSERT INTO Project (title, description, total_amount, order_date, status, user_id, fee)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO Project (title, description, total_amount, status, user_id, fee)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id;
 
 

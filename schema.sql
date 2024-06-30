@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS Project (
     title VARCHAR(255),
     description TEXT,
     total_amount INTEGER, 
-    order_date DATE,
+    order_date DATE DEFAULT CURRENT_DATE,
     status BOOLEAN,
-      user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
     fee INTEGER
 );
 
