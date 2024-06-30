@@ -16,12 +16,13 @@ var (
 )
 
 func InitDB() (*sql.DB, error) {
+
 	// Establish database connection
 	db, err := sql.Open("postgres", "postgres://admin:admin@localhost:5432/database?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
-
+	TearDown(db)
 	// Ping the database to verify connection
 	err = db.Ping()
 	if err != nil {
@@ -30,11 +31,6 @@ func InitDB() (*sql.DB, error) {
 
 	db.SetMaxOpenConns(5)
 	db.SetMaxIdleConns(10)
-
-	err = CreateRoleTable(db)
-	if err != nil {
-		return nil, err
-	}
 
 	err = CreateUserTable(db)
 	if err != nil {
@@ -72,27 +68,12 @@ func CreateUserTable(db *sql.DB) error {
 		password VARCHAR(255) NOT NULL,
 		firstname VARCHAR(100),
 		surname VARCHAR(100),
-		mobile_phone VARCHAR(20) UNIQUE,
-		role_id INTEGER REFERENCES Role(id)
+		mobile_phone VARCHAR(20) UNIQUE
 	);
 	`
 	_, err := db.Exec(createUserTable)
 	if err != nil {
 		return errors.Join(ErrorCreateUserTable, err)
-	}
-	return nil
-}
-
-func CreateRoleTable(db *sql.DB) error {
-	createRoleTable := `
-	CREATE TABLE IF NOT EXISTS Role (
-		id SERIAL PRIMARY KEY,
-		type VARCHAR(50) UNIQUE NOT NULL
-	);
-	`
-	_, err := db.Exec(createRoleTable)
-	if err != nil {
-		return errors.Join(ErrorRoleTable, err)
 	}
 	return nil
 }
@@ -103,11 +84,11 @@ func CreateProjectTable(db *sql.DB) error {
 		id SERIAL PRIMARY KEY,
 		title VARCHAR(255),
 		description TEXT,
-		total_amount INTEGER, 
-		order_date DATE,
+		total_amount NUMERIC(10,3), 
+		order_date TIME DEFAULT CURRENT_TIMESTAMP,
 		status BOOLEAN,
-		user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
-		fee INTEGER
+		user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+		fee NUMERIC(5,3)
 	);
 	`
 	_, err := db.Exec(createProjectTable)
@@ -126,7 +107,6 @@ func CreateProjectComment(db *sql.DB) error {
 		date TIMESTAMP,
 		text TEXT
 	);
-
 	`
 	_, err := db.Exec(createProjectComment)
 	if err != nil {

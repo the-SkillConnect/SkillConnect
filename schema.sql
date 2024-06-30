@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS Project (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    total_amount INTEGER, 
-    order_date DATE DEFAULT CURRENT_DATE,
+    total_amount NUMERIC(10,3), 
+    order_date TIME DEFAULT CURRENT_TIMESTAMP,
     status BOOLEAN,
-    user_id INTEGER REFERENCES Users(id) ON DELETE CASCADE,
-    fee INTEGER
+    user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
+    fee NUMERIC(5,3)
 );
 
 CREATE TABLE IF NOT EXISTS ProjectComment (

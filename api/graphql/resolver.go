@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 	"database/sql"
-	"time"
+	"fmt"
 
 	"github.com/graphql-go/graphql"
 	"github.com/the-SkillConnect/SkillConnect/db"
@@ -47,15 +47,17 @@ func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{},
 
 func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
+	fmt.Printf("%+v\n", input)
+
 	insertParams := db.InsertProjectParams{
 		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
 		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
-		TotalAmount: sql.NullInt32{Int32: int32(input["total_amount"].(int)), Valid: input["total_amount"] != nil},
-		OrderDate:   sql.NullTime{Time: input["order_date"].(time.Time), Valid: input["order_date"] != nil},
+		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
 		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		UserID:      sql.NullInt32{Int32: int32(input["user_id"].(int)), Valid: input["user_id"] != nil},
-		Fee:         sql.NullInt32{Int32: int32(input["fee"].(int)), Valid: input["fee"] != nil},
+		UserID:      7,
+		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
 	}
+	fmt.Printf("%+v\n", insertParams)
 	id, err := r.DbInstance.InsertProject(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
@@ -94,5 +96,5 @@ func (r *Resolver) ResolveGetUsers(params graphql.ResolveParams) (interface{}, e
 }
 
 func (r *Resolver) ResolveGetProjects(params graphql.ResolveParams) (interface{}, error) {
-	return r.DbInstance.GetProjects(params.Context)
+	return r.DbInstance.GetProjects(context.Background())
 }

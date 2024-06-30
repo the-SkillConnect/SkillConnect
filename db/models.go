@@ -18,11 +18,11 @@ type Project struct {
 	ID          int32          `json:"id"`
 	Title       sql.NullString `json:"title"`
 	Description sql.NullString `json:"description"`
-	TotalAmount sql.NullInt32  `json:"total_amount"`
+	TotalAmount sql.NullString `json:"total_amount"`
 	OrderDate   sql.NullTime   `json:"order_date"`
 	Status      sql.NullBool   `json:"status"`
-	UserID      sql.NullInt32  `json:"user_id"`
-	Fee         sql.NullInt32  `json:"fee"`
+	UserID      int32          `json:"user_id"`
+	Fee         sql.NullString `json:"fee"`
 }
 
 type Projectcomment struct {

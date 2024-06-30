@@ -264,19 +264,18 @@ func (q *Queries) InsertComment(ctx context.Context, arg InsertCommentParams) (i
 }
 
 const insertProject = `-- name: InsertProject :one
-INSERT INTO Project (title, description, total_amount, order_date, status, user_id, fee)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO Project (title, description, total_amount, status, user_id, fee)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id
 `
 
 type InsertProjectParams struct {
 	Title       sql.NullString `json:"title"`
 	Description sql.NullString `json:"description"`
-	TotalAmount sql.NullInt32  `json:"total_amount"`
-	OrderDate   sql.NullTime   `json:"order_date"`
+	TotalAmount sql.NullString `json:"total_amount"`
 	Status      sql.NullBool   `json:"status"`
-	UserID      sql.NullInt32  `json:"user_id"`
-	Fee         sql.NullInt32  `json:"fee"`
+	UserID      int32          `json:"user_id"`
+	Fee         sql.NullString `json:"fee"`
 }
 
 func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (int32, error) {
@@ -284,7 +283,6 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 		arg.Title,
 		arg.Description,
 		arg.TotalAmount,
-		arg.OrderDate,
 		arg.Status,
 		arg.UserID,
 		arg.Fee,
@@ -371,19 +369,18 @@ func (q *Queries) UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDPa
 
 const updateProjectByID = `-- name: UpdateProjectByID :one
 UPDATE Project
-SET title = $1, description = $2, total_amount = $3, order_date = $4, status = $5, user_id = $6, fee = $7
-WHERE id = $8
+SET title = $1, description = $2, total_amount = $3, status = $4, user_id = $5, fee = $6
+WHERE id = $7
 RETURNING id
 `
 
 type UpdateProjectByIDParams struct {
 	Title       sql.NullString `json:"title"`
 	Description sql.NullString `json:"description"`
-	TotalAmount sql.NullInt32  `json:"total_amount"`
-	OrderDate   sql.NullTime   `json:"order_date"`
+	TotalAmount sql.NullString `json:"total_amount"`
 	Status      sql.NullBool   `json:"status"`
-	UserID      sql.NullInt32  `json:"user_id"`
-	Fee         sql.NullInt32  `json:"fee"`
+	UserID      int32          `json:"user_id"`
+	Fee         sql.NullString `json:"fee"`
 	ID          int32          `json:"id"`
 }
 
@@ -392,7 +389,6 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 		arg.Title,
 		arg.Description,
 		arg.TotalAmount,
-		arg.OrderDate,
 		arg.Status,
 		arg.UserID,
 		arg.Fee,
