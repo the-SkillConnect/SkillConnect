@@ -3,7 +3,6 @@ package graphql
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/graphql-go/graphql"
@@ -36,7 +35,8 @@ func (r *Resolver) ResolveGetProjectCommentByID(params graphql.ResolveParams) (i
 
 func (r *Resolver) ResolveGetProjectCommentsByProjectID(params graphql.ResolveParams) (interface{}, error) {
 	id := params.Args["project_id"].(int)
-	return r.DbInstance.GetProjectCommentsByProjectID(context.Background(), int32(id))
+	data, _ := r.DbInstance.GetProjectCommentsByProjectID(context.Background(), int32(id))
+	return data, nil
 }
 
 func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{}, error) {
@@ -57,8 +57,6 @@ func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{},
 
 func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	fmt.Printf("%+v\n", input)
-	// orderDate := time.Now().Format("2006-01-02 15:04:05")
 	insertParams := db.InsertProjectParams{
 		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
 		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
@@ -68,7 +66,6 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 		UserID:      int32(input["user_id"].(int)),
 		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
 	}
-	fmt.Printf("%+v\n", insertParams)
 	id, err := r.DbInstance.InsertProject(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
@@ -84,7 +81,6 @@ func (r *Resolver) ResolveInsertProjectComment(params graphql.ResolveParams) (in
 		Date:      sql.NullTime{Time: time.Now(), Valid: true},
 		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
 	}
-	fmt.Printf("%+v\n", insertParams)
 	id, err := r.DbInstance.InsertProjectComment(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
@@ -153,14 +149,6 @@ func (r *Resolver) ResolveUpdateProject(params graphql.ResolveParams) (interface
 	return r.DbInstance.GetProjectByID(context.Background(), updateParams.ID)
 }
 
-// type UpdateProjectCommentByIDParams struct {
-// 	UserID    sql.NullInt32  `json:"user_id"`
-// 	ProjectID sql.NullInt32  `json:"project_id"`
-// 	Date      sql.NullTime   `json:"date"`
-// 	Text      sql.NullString `json:"text"`
-// 	ID        int32          `json:"id"`
-// }
-
 func (r *Resolver) ResolveUpdateProjectComment(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
 	updateParams := db.UpdateProjectCommentByIDParams{
@@ -170,7 +158,6 @@ func (r *Resolver) ResolveUpdateProjectComment(params graphql.ResolveParams) (in
 		Date:      sql.NullTime{Time: time.Now(), Valid: true},
 		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
 	}
-	fmt.Printf("%+v\n", updateParams)
 	_, err := r.DbInstance.UpdateProjectCommentByID(context.Background(), updateParams)
 	if err != nil {
 		return nil, err

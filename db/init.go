@@ -17,13 +17,10 @@ var (
 
 func InitDB() (*sql.DB, error) {
 
-	// Establish database connection
 	db, err := sql.Open("postgres", "postgres://admin:admin@localhost:5432/database?sslmode=disable")
 	if err != nil {
 		return nil, err
 	}
-	TearDown(db)
-	// Ping the database to verify connection
 	err = db.Ping()
 	if err != nil {
 		return nil, err
@@ -31,6 +28,8 @@ func InitDB() (*sql.DB, error) {
 
 	db.SetMaxOpenConns(5)
 	db.SetMaxIdleConns(10)
+
+	//TearDown(db)
 
 	err = CreateUserTable(db)
 	if err != nil {

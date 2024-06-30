@@ -45,6 +45,20 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					Type:    graphql.NewList(AssignedProjectType),
 					Resolve: resolver.ResolveGetAssignedProjects,
 				},
+				"ProjectCommentsByProjectID": &graphql.Field{
+					Type: graphql.NewList(ProjectCommentType),
+					Args: graphql.FieldConfigArgument{
+						"project_id": &graphql.ArgumentConfig{Type: graphql.Int},
+					},
+					Resolve: resolver.ResolveGetProjectCommentsByProjectID,
+				},
+				"ProjectCommentsByID": &graphql.Field{
+					Type: ProjectCommentType,
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{Type: graphql.Int},
+					},
+					Resolve: resolver.ResolveGetProjectCommentByID,
+				},
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
