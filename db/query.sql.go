@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const deleteAssignedProjectByID = `-- name: DeleteAssignedProjectByID :exec
@@ -264,8 +265,8 @@ func (q *Queries) InsertComment(ctx context.Context, arg InsertCommentParams) (i
 }
 
 const insertProject = `-- name: InsertProject :one
-INSERT INTO Project (title, description, total_amount, status, user_id, fee)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO Project (title, description, total_amount, status, user_id, fee, order_date)
+VALUES ($1, $2, $3, $4, $5, $6,$7)
 RETURNING id
 `
 
@@ -276,6 +277,7 @@ type InsertProjectParams struct {
 	Status      sql.NullBool   `json:"status"`
 	UserID      int32          `json:"user_id"`
 	Fee         sql.NullString `json:"fee"`
+	OrderDate   time.Time      `json:"order_date"`
 }
 
 func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (int32, error) {
@@ -286,6 +288,7 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 		arg.Status,
 		arg.UserID,
 		arg.Fee,
+		arg.OrderDate,
 	)
 	var id int32
 	err := row.Scan(&id)
@@ -369,8 +372,8 @@ func (q *Queries) UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDPa
 
 const updateProjectByID = `-- name: UpdateProjectByID :one
 UPDATE Project
-SET title = $1, description = $2, total_amount = $3, status = $4, user_id = $5, fee = $6
-WHERE id = $7
+SET title = $1, description = $2, total_amount = $3, status = $4, user_id = $5, fee = $6, order_date = $7
+WHERE id = $8
 RETURNING id
 `
 
@@ -381,6 +384,7 @@ type UpdateProjectByIDParams struct {
 	Status      sql.NullBool   `json:"status"`
 	UserID      int32          `json:"user_id"`
 	Fee         sql.NullString `json:"fee"`
+	OrderDate   time.Time      `json:"order_date"`
 	ID          int32          `json:"id"`
 }
 
@@ -392,6 +396,7 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 		arg.Status,
 		arg.UserID,
 		arg.Fee,
+		arg.OrderDate,
 		arg.ID,
 	)
 	var id int32

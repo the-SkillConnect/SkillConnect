@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Project (
     title VARCHAR(255),
     description TEXT,
     total_amount NUMERIC(10,3), 
-    order_date TIME DEFAULT CURRENT_TIMESTAMP,
+    order_date DATE NOT NULL,
     status BOOLEAN,
     user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
     fee NUMERIC(5,3)

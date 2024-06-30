@@ -49,14 +49,14 @@ var UpdateUserInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 var ProjectType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Project",
 	Fields: graphql.Fields{
-		"id":          &graphql.Field{Type: graphql.Int},
-		"title":       &graphql.Field{Type: graphql.String},
-		"description": &graphql.Field{Type: graphql.String},
-		"total_amount": &graphql.Field{Type: graphql.Float},
-		"orderDate":   &graphql.Field{Type: graphql.String},
-		"status":      &graphql.Field{Type: graphql.Boolean},
-		"userID":      &graphql.Field{Type: graphql.Int},
-		"fee":         &graphql.Field{Type: graphql.Float},
+		"id":           &graphql.Field{Type: graphql.Int},
+		"title":        &graphql.Field{Type: graphql.String},
+		"description":  &graphql.Field{Type: graphql.String},
+		"total_amount": &graphql.Field{Type: graphql.String},
+		"orderDate":    &graphql.Field{Type: graphql.String},
+		"status":       &graphql.Field{Type: graphql.Boolean},
+		"user_id":      &graphql.Field{Type: graphql.Int},
+		"fee":          &graphql.Field{Type: graphql.String},
 	},
 })
 
@@ -64,11 +64,11 @@ var ProjectType = graphql.NewObject(graphql.ObjectConfig{
 var InsertProjectInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InsertProjectInput",
 	Fields: graphql.InputObjectConfigFieldMap{
-		"title":       &graphql.InputObjectFieldConfig{Type: graphql.String},
-		"description": &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"title":        &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"description":  &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"total_amount": &graphql.InputObjectFieldConfig{Type: graphql.String},
-		"status":      &graphql.InputObjectFieldConfig{Type: graphql.Boolean},
-		"userID":      &graphql.InputObjectFieldConfig{Type: graphql.Int},
-		"fee":         &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"status":       &graphql.InputObjectFieldConfig{Type: graphql.Boolean},
+		"user_id":      &graphql.InputObjectFieldConfig{Type: graphql.Int},
+		"fee":          &graphql.InputObjectFieldConfig{Type: graphql.String},
 	},
 })

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/graphql-go/graphql"
 	"github.com/the-SkillConnect/SkillConnect/db"
@@ -54,7 +55,8 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
 		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
 		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		UserID:      7,
+		OrderDate:   time.Now(),
+		UserID:      int32(input["user_id"].(int)),
 		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
 	}
 	fmt.Printf("%+v\n", insertParams)
