@@ -8,8 +8,9 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: database
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
+    network_mode: host
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
