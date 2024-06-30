@@ -85,7 +85,7 @@ func CreateProjectTable(db *sql.DB) error {
 		title VARCHAR(255),
 		description TEXT,
 		total_amount NUMERIC(10,3), 
-		order_date TIME DEFAULT CURRENT_TIMESTAMP,
+		order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		status BOOLEAN,
 		user_id INTEGER NOT NULL REFERENCES Users(id) ON DELETE CASCADE,
 		fee NUMERIC(5,3)

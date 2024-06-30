@@ -49,13 +49,13 @@ func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{},
 func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
 	fmt.Printf("%+v\n", input)
-
+	// orderDate := time.Now().Format("2006-01-02 15:04:05")
 	insertParams := db.InsertProjectParams{
 		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
 		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
 		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
 		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		OrderDate:   time.Now(),
+		OrderDate:   sql.NullTime{Time: time.Now(), Valid: true},
 		UserID:      int32(input["user_id"].(int)),
 		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
 	}

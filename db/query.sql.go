@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"time"
 )
 
 const deleteAssignedProjectByID = `-- name: DeleteAssignedProjectByID :exec
@@ -277,7 +276,7 @@ type InsertProjectParams struct {
 	Status      sql.NullBool   `json:"status"`
 	UserID      int32          `json:"user_id"`
 	Fee         sql.NullString `json:"fee"`
-	OrderDate   time.Time      `json:"order_date"`
+	OrderDate   sql.NullTime   `json:"order_date"`
 }
 
 func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (int32, error) {
@@ -384,7 +383,7 @@ type UpdateProjectByIDParams struct {
 	Status      sql.NullBool   `json:"status"`
 	UserID      int32          `json:"user_id"`
 	Fee         sql.NullString `json:"fee"`
-	OrderDate   time.Time      `json:"order_date"`
+	OrderDate   sql.NullTime   `json:"order_date"`
 	ID          int32          `json:"id"`
 }
 

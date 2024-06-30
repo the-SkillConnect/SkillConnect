@@ -6,7 +6,6 @@ package db
 
 import (
 	"database/sql"
-	"time"
 )
 
 type Assignedproject struct {
@@ -20,7 +19,7 @@ type Project struct {
 	Title       sql.NullString `json:"title"`
 	Description sql.NullString `json:"description"`
 	TotalAmount sql.NullString `json:"total_amount"`
-	OrderDate   time.Time      `json:"order_date"`
+	OrderDate   sql.NullTime   `json:"order_date"`
 	Status      sql.NullBool   `json:"status"`
 	UserID      int32          `json:"user_id"`
 	Fee         sql.NullString `json:"fee"`
