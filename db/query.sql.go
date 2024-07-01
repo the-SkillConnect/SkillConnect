@@ -729,18 +729,20 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 }
 
 const insertUser = `-- name: InsertUser :one
-INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id
 `
 
 type InsertUserParams struct {
-	Email         string `json:"email"`
-	Password      string `json:"password"`
-	Firstname     string `json:"firstname"`
-	Surname       string `json:"surname"`
-	MobilePhone   string `json:"mobile_phone"`
-	WalletAddress int64  `json:"wallet_address"`
+	Email         string    `json:"email"`
+	Password      string    `json:"password"`
+	Firstname     string    `json:"firstname"`
+	Surname       string    `json:"surname"`
+	MobilePhone   string    `json:"mobile_phone"`
+	WalletAddress string    `json:"wallet_address"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int64, error) {
@@ -751,6 +753,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int64, 
 		arg.Surname,
 		arg.MobilePhone,
 		arg.WalletAddress,
+		arg.CreatedAt,
+		arg.UpdatedAt,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -874,18 +878,19 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 
 const updateUserByID = `-- name: UpdateUserByID :one
 UPDATE user_identity
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5
-WHERE id = $6
+SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
+WHERE id = $7
 RETURNING id
 `
 
 type UpdateUserByIDParams struct {
-	Email       string `json:"email"`
-	Password    string `json:"password"`
-	Firstname   string `json:"firstname"`
-	Surname     string `json:"surname"`
-	MobilePhone string `json:"mobile_phone"`
-	ID          int64  `json:"id"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	Firstname   string    `json:"firstname"`
+	Surname     string    `json:"surname"`
+	MobilePhone string    `json:"mobile_phone"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	ID          int64     `json:"id"`
 }
 
 func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) (int64, error) {
@@ -895,6 +900,7 @@ func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) 
 		arg.Firstname,
 		arg.Surname,
 		arg.MobilePhone,
+		arg.UpdatedAt,
 		arg.ID,
 	)
 	var id int64

@@ -3,8 +3,8 @@ DELETE FROM user_identity WHERE id = $1;
 
 -- name: UpdateUserByID :one
 UPDATE user_identity
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5
-WHERE id = $6
+SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
+WHERE id = $7
 RETURNING id;
 
 -- name: GetUserByID :one
@@ -14,8 +14,8 @@ SELECT * FROM user_identity WHERE id = $1;
 SELECT * FROM user_identity;
 
 -- name: InsertUser :one
-INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id;
 
 -- name: DeleteProjectByID :exec
