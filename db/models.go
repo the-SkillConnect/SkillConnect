@@ -6,38 +6,67 @@ package db
 
 import (
 	"database/sql"
+	"time"
 )
 
-type Assignedproject struct {
-	UserID    int32        `json:"user_id"`
-	ProjectID int32        `json:"project_id"`
-	Issued    sql.NullBool `json:"issued"`
+type AssignProject struct {
+	UserID    int64        `json:"user_id"`
+	ProjectID int64        `json:"project_id"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
+}
+
+type Category struct {
+	ID    int32  `json:"id"`
+	Title string `json:"title"`
+}
+
+type Comment struct {
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	ProjectID int64     `json:"project_id"`
+	Date      time.Time `json:"date"`
+	Text      string    `json:"text"`
 }
 
 type Project struct {
-	ID          int32          `json:"id"`
-	Title       sql.NullString `json:"title"`
-	Description sql.NullString `json:"description"`
-	TotalAmount sql.NullString `json:"total_amount"`
-	OrderDate   sql.NullTime   `json:"order_date"`
-	Status      sql.NullBool   `json:"status"`
-	UserID      int32          `json:"user_id"`
-	Fee         sql.NullString `json:"fee"`
+	ID          int64         `json:"id"`
+	Description string        `json:"description"`
+	Title       string        `json:"title"`
+	TotalAmount string        `json:"total_amount"`
+	DoneStatus  sql.NullBool  `json:"done_status"`
+	UserID      int64         `json:"user_id"`
+	Fee         string        `json:"fee"`
+	Categories  sql.NullInt64 `json:"categories"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 }
 
-type Projectcomment struct {
-	ID        int32          `json:"id"`
-	UserID    int32          `json:"user_id"`
-	ProjectID int32          `json:"project_id"`
-	Date      sql.NullTime   `json:"date"`
-	Text      sql.NullString `json:"text"`
+type UserIdentity struct {
+	ID            int64     `json:"id"`
+	Email         string    `json:"email"`
+	Password      string    `json:"password"`
+	Firstname     string    `json:"firstname"`
+	Surname       string    `json:"surname"`
+	MobilePhone   string    `json:"mobile_phone"`
+	WalletAddress int64     `json:"wallet_address"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
-type User struct {
-	ID          int32          `json:"id"`
-	Email       string         `json:"email"`
-	Password    string         `json:"password"`
-	Firstname   sql.NullString `json:"firstname"`
-	Surname     sql.NullString `json:"surname"`
-	MobilePhone sql.NullString `json:"mobile_phone"`
+type UserProfile struct {
+	UserID           int64          `json:"user_id"`
+	Rating           int64          `json:"rating"`
+	Description      sql.NullString `json:"description"`
+	DoneProjects     int64          `json:"done_projects"`
+	GivenProjects    int64          `json:"given_projects"`
+	RecommendationID sql.NullInt64  `json:"recommendation_id"`
+	CreatedAt        time.Time      `json:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at"`
+}
+
+type UserRecommendation struct {
+	GivenID     int64  `json:"given_id"`
+	ReceivedID  int64  `json:"received_id"`
+	Description string `json:"description"`
 }
