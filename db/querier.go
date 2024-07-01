@@ -13,7 +13,8 @@ type Querier interface {
 	DeleteCategory(ctx context.Context, id int32) error
 	DeleteCommentByID(ctx context.Context, id int64) error
 	DeleteProjectByID(ctx context.Context, id int64) error
-	DeleteUserByID(ctx context.Context, id int64) error
+	DeleteUserIdentityByID(ctx context.Context, id int64) error
+	DeleteUserProfileByID(ctx context.Context, userID int64) error
 	DeleteUserRecommendation(ctx context.Context, arg DeleteUserRecommendationParams) error
 	GetAssignedProjectsByUserID(ctx context.Context, userID int64) ([]AssignProject, error)
 	GetAssignedUsersByProjectID(ctx context.Context, projectID int64) ([]AssignProject, error)
@@ -26,22 +27,22 @@ type Querier interface {
 	GetProjectByID(ctx context.Context, id int64) (Project, error)
 	GetProjectDetails(ctx context.Context, id int64) (GetProjectDetailsRow, error)
 	GetProjects(ctx context.Context) ([]Project, error)
-	GetUserByID(ctx context.Context, id int64) (UserIdentity, error)
+	GetUserIdentityByID(ctx context.Context, id int64) (UserIdentity, error)
 	GetUserProfileByUserID(ctx context.Context, userID int64) (UserProfile, error)
 	GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error)
 	GetUserRecommendationByGivenID(ctx context.Context, givenID int64) (UserRecommendation, error)
 	GetUserRecommendationByReceivedID(ctx context.Context, receivedID int64) (UserRecommendation, error)
-	GetUsers(ctx context.Context) ([]UserIdentity, error)
+	GetUsersIdentity(ctx context.Context) ([]UserIdentity, error)
 	InsertAssignProject(ctx context.Context, arg InsertAssignProjectParams) (InsertAssignProjectRow, error)
 	InsertCategory(ctx context.Context, title string) (int32, error)
 	InsertComment(ctx context.Context, arg InsertCommentParams) (int64, error)
 	InsertProject(ctx context.Context, arg InsertProjectParams) (int64, error)
-	InsertUser(ctx context.Context, arg InsertUserParams) (int64, error)
+	InsertUserIdentity(ctx context.Context, arg InsertUserIdentityParams) (int64, error)
 	InsertUserProfile(ctx context.Context, arg InsertUserProfileParams) (int64, error)
 	InsertUserRecommendation(ctx context.Context, arg InsertUserRecommendationParams) (InsertUserRecommendationRow, error)
 	UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDParams) (int64, error)
 	UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDParams) (int64, error)
-	UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) (int64, error)
+	UpdateUserIdentityByID(ctx context.Context, arg UpdateUserIdentityByIDParams) (int64, error)
 	UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (int64, error)
 }
 

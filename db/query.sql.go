@@ -52,12 +52,21 @@ func (q *Queries) DeleteProjectByID(ctx context.Context, id int64) error {
 	return err
 }
 
-const deleteUserByID = `-- name: DeleteUserByID :exec
+const deleteUserIdentityByID = `-- name: DeleteUserIdentityByID :exec
 DELETE FROM user_identity WHERE id = $1
 `
 
-func (q *Queries) DeleteUserByID(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteUserByID, id)
+func (q *Queries) DeleteUserIdentityByID(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUserIdentityByID, id)
+	return err
+}
+
+const deleteUserProfileByID = `-- name: DeleteUserProfileByID :exec
+DELETE FROM user_profile WHERE user_id = $1
+`
+
+func (q *Queries) DeleteUserProfileByID(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUserProfileByID, userID)
 	return err
 }
 
@@ -477,12 +486,12 @@ func (q *Queries) GetProjects(ctx context.Context) ([]Project, error) {
 	return items, nil
 }
 
-const getUserByID = `-- name: GetUserByID :one
+const getUserIdentityByID = `-- name: GetUserIdentityByID :one
 SELECT id, email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity WHERE id = $1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id int64) (UserIdentity, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID, id)
+func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdentity, error) {
+	row := q.db.QueryRowContext(ctx, getUserIdentityByID, id)
 	var i UserIdentity
 	err := row.Scan(
 		&i.ID,
@@ -599,12 +608,12 @@ func (q *Queries) GetUserRecommendationByReceivedID(ctx context.Context, receive
 	return i, err
 }
 
-const getUsers = `-- name: GetUsers :many
+const getUsersIdentity = `-- name: GetUsersIdentity :many
 SELECT id, email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity
 `
 
-func (q *Queries) GetUsers(ctx context.Context) ([]UserIdentity, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers)
+func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersIdentity)
 	if err != nil {
 		return nil, err
 	}
@@ -728,13 +737,13 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 	return id, err
 }
 
-const insertUser = `-- name: InsertUser :one
+const insertUserIdentity = `-- name: InsertUserIdentity :one
 INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id
 `
 
-type InsertUserParams struct {
+type InsertUserIdentityParams struct {
 	Email         string    `json:"email"`
 	Password      string    `json:"password"`
 	Firstname     string    `json:"firstname"`
@@ -745,8 +754,8 @@ type InsertUserParams struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, insertUser,
+func (q *Queries) InsertUserIdentity(ctx context.Context, arg InsertUserIdentityParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertUserIdentity,
 		arg.Email,
 		arg.Password,
 		arg.Firstname,
@@ -762,8 +771,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (int64, 
 }
 
 const insertUserProfile = `-- name: InsertUserProfile :one
-INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id,created_at,updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING user_id
 `
 
@@ -774,6 +783,8 @@ type InsertUserProfileParams struct {
 	DoneProjects     int64          `json:"done_projects"`
 	GivenProjects    int64          `json:"given_projects"`
 	RecommendationID sql.NullInt64  `json:"recommendation_id"`
+	CreatedAt        time.Time      `json:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at"`
 }
 
 func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfileParams) (int64, error) {
@@ -784,6 +795,8 @@ func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfilePa
 		arg.DoneProjects,
 		arg.GivenProjects,
 		arg.RecommendationID,
+		arg.CreatedAt,
+		arg.UpdatedAt,
 	)
 	var user_id int64
 	err := row.Scan(&user_id)
@@ -876,14 +889,14 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 	return id, err
 }
 
-const updateUserByID = `-- name: UpdateUserByID :one
+const updateUserIdentityByID = `-- name: UpdateUserIdentityByID :one
 UPDATE user_identity
 SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
 WHERE id = $7
 RETURNING id
 `
 
-type UpdateUserByIDParams struct {
+type UpdateUserIdentityByIDParams struct {
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
 	Firstname   string    `json:"firstname"`
@@ -893,8 +906,8 @@ type UpdateUserByIDParams struct {
 	ID          int64     `json:"id"`
 }
 
-func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, updateUserByID,
+func (q *Queries) UpdateUserIdentityByID(ctx context.Context, arg UpdateUserIdentityByIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, updateUserIdentityByID,
 		arg.Email,
 		arg.Password,
 		arg.Firstname,
@@ -910,8 +923,8 @@ func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) 
 
 const updateUserProfile = `-- name: UpdateUserProfile :one
 UPDATE user_profile
-SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5
-WHERE user_id = $6
+SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5, updated_at = $6
+WHERE user_id = $7
 RETURNING user_id
 `
 
@@ -921,6 +934,7 @@ type UpdateUserProfileParams struct {
 	DoneProjects     int64          `json:"done_projects"`
 	GivenProjects    int64          `json:"given_projects"`
 	RecommendationID sql.NullInt64  `json:"recommendation_id"`
+	UpdatedAt        time.Time      `json:"updated_at"`
 	UserID           int64          `json:"user_id"`
 }
 
@@ -931,6 +945,7 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 		arg.DoneProjects,
 		arg.GivenProjects,
 		arg.RecommendationID,
+		arg.UpdatedAt,
 		arg.UserID,
 	)
 	var user_id int64
