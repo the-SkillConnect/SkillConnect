@@ -31,41 +31,42 @@ func InitDB() (*sql.DB, error) {
 	db.SetMaxOpenConns(5)
 	db.SetMaxIdleConns(10)
 
-	//TearDown(db)
-
-	err = CreateUserIdentityTable(db)
+	return db, err
+}
+func CreateTables(db *sql.DB) error {
+	err := CreateUserIdentityTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateUserProfileTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateUserRecommendationTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateProjectTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateCommentTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateCategoryTable(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = CreateAssignedProjectTable(db)
+	return err
 
-	return db, err
 }
 
 func TearDown(db *sql.DB) {
