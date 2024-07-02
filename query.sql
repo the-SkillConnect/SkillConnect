@@ -3,7 +3,7 @@ DELETE FROM user_identity WHERE id = $1;
 
 -- name: UpdateUserIdentityByID :one
 UPDATE user_identity
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
+SET email = $1, password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
 WHERE id = $7
 RETURNING id;
 
@@ -14,47 +14,47 @@ SELECT * FROM user_identity WHERE id = $1;
 SELECT * FROM user_identity;
 
 -- name: InsertUserIdentity :one
-INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
+INSERT INTO user_identity (email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id;
 
 -- name: DeleteProjectByID :exec
-DELETE FROM projects WHERE id = $1;
+DELETE FROM project WHERE id = $1;
 
 -- name: UpdateProjectByID :one
-UPDATE projects
+UPDATE project
 SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, categories = $7
 WHERE id = $8
 RETURNING id;
 
 -- name: GetProjectByID :one
-SELECT * FROM projects WHERE id = $1;
+SELECT * FROM project WHERE id = $1;
 
--- name: GetProjects :many
-SELECT * FROM projects;
+-- name: Getproject :many
+SELECT * FROM project;
 
 -- name: InsertProject :one
-INSERT INTO projects (description, title, total_amount, done_status, user_id, fee, categories)
+INSERT INTO project (description, title, total_amount, done_status, user_id, fee, categories)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id;
 
 -- name: DeleteCommentByID :exec
-DELETE FROM comments WHERE id = $1;
+DELETE FROM comment WHERE id = $1;
 
 -- name: UpdateCommentByID :one
-UPDATE comments
+UPDATE comment
 SET user_id = $1, project_id = $2, date = $3, text = $4
 WHERE id = $5
 RETURNING id;
 
 -- name: GetCommentByID :one
-SELECT * FROM comments WHERE id = $1;
+SELECT * FROM comment WHERE id = $1;
 
--- name: GetComments :many
-SELECT * FROM comments;
+-- name: Getcomment :many
+SELECT * FROM comment;
 
 -- name: InsertComment :one
-INSERT INTO comments (user_id, project_id, date, text)
+INSERT INTO comment (user_id, project_id, date, text)
 VALUES ($1, $2, $3, $4)
 RETURNING id;
 
@@ -66,7 +66,7 @@ INSERT INTO assign_project (user_id, project_id)
 VALUES ($1, $2)
 RETURNING user_id, project_id;
 
--- name: GetAssignedProjectsByUserID :many
+-- name: GetAssignedprojectByUserID :many
 SELECT * FROM assign_project WHERE user_id = $1;
 
 -- name: GetAssignedUsersByProjectID :many
@@ -74,7 +74,7 @@ SELECT * FROM assign_project WHERE project_id = $1;
 
 -- name: UpdateUserProfile :one
 UPDATE user_profile
-SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5, updated_at = $6
+SET rating = $1, description = $2, done_project = $3, given_project = $4, recommendation_id = $5, updated_at = $6
 WHERE user_id = $7
 RETURNING user_id;
 
@@ -82,7 +82,7 @@ RETURNING user_id;
 SELECT * FROM user_profile WHERE user_id = $1;
 
 -- name: InsertUserProfile :one
-INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id,created_at,updated_at)
+INSERT INTO user_profile (user_id, rating, description, done_project, given_project, recommendation_id,created_at,updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING user_id;
 
@@ -121,13 +121,13 @@ SELECT * FROM category;
 SELECT 
     ui.id AS user_id,
     ui.email,
-    ui.firstname,
+    ui.first_name,
     ui.surname,
     ui.mobile_phone,
     up.rating,
     up.description AS profile_description,
-    up.done_projects,
-    up.given_projects,
+    up.done_project,
+    up.given_project,
     ur.given_id,
     ur.received_id,
     ur.description AS recommendation_description
@@ -154,7 +154,7 @@ SELECT
     p.updated_at,
     c.title AS category_title
 FROM 
-    projects p
+    project p
 LEFT JOIN 
     category c ON p.categories = c.id
 WHERE 
@@ -167,35 +167,35 @@ SELECT
     ap.created_at,
     ap.updated_at,
     ui1.email AS assigned_user_email,
-    ui1.firstname AS assigned_user_firstname,
+    ui1.first_name AS assigned_user_first_name,
     ui1.surname AS assigned_user_surname,
     ui2.id AS project_owner_id,
     ui2.email AS project_owner_email,
-    ui2.firstname AS project_owner_firstname,
+    ui2.first_name AS project_owner_first_name,
     ui2.surname AS project_owner_surname
 FROM 
     assign_project ap
 JOIN 
-    projects p ON ap.project_id = p.id
+    project p ON ap.project_id = p.id
 JOIN 
     user_identity ui1 ON ap.user_id = ui1.id
 JOIN 
     user_identity ui2 ON p.user_id = ui2.id;
 
--- name: GetCommentsWithUserAndProject :many
+-- name: GetcommentWithUserAndProject :many
 SELECT 
     c.id AS comment_id,
     c.date,
     c.text,
     ui.id AS user_id,
     ui.email,
-    ui.firstname,
+    ui.first_name,
     ui.surname,
     p.id AS project_id,
     p.title
 FROM 
-    comments c
+    comment c
 JOIN 
     user_identity ui ON c.user_id = ui.id
 JOIN 
-    projects p ON c.project_id = p.id;
+    project p ON c.project_id = p.id;
