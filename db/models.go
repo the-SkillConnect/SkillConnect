@@ -49,7 +49,7 @@ type UserIdentity struct {
 	Firstname     string    `json:"firstname"`
 	Surname       string    `json:"surname"`
 	MobilePhone   string    `json:"mobile_phone"`
-	WalletAddress int64     `json:"wallet_address"`
+	WalletAddress string    `json:"wallet_address"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }

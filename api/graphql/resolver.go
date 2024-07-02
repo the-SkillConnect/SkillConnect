@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/graphql-go/graphql"
@@ -19,94 +20,36 @@ func NewResolver(dbInstance db.Querier) *Resolver {
 	}
 }
 
-func (r *Resolver) ResolveGetUserByID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	return r.DbInstance.GetUserByID(context.Background(), int32(id))
-}
-
-func (r *Resolver) ResolveGetProjectByID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	return r.DbInstance.GetProjectByID(context.Background(), int32(id))
-}
-func (r *Resolver) ResolveGetProjectCommentByID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	return r.DbInstance.GetProjectCommentByID(context.Background(), int32(id))
-}
-
-func (r *Resolver) ResolveGetProjectCommentsByProjectID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["project_id"].(int)
-	data, _ := r.DbInstance.GetProjectCommentsByProjectID(context.Background(), int32(id))
-	return data, nil
-}
-
 func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	insertParams := db.InsertUserParams{
-		Email:       input["email"].(string),
-		Password:    input["password"].(string),
-		Firstname:   sql.NullString{String: input["firstname"].(string), Valid: input["firstname"] != nil},
-		Surname:     sql.NullString{String: input["surname"].(string), Valid: input["surname"] != nil},
-		MobilePhone: sql.NullString{String: input["mobilePhone"].(string), Valid: input["mobilePhone"] != nil},
+	fmt.Println("heree", input)
+	insertParams := db.InsertUserIdentityParams{
+		Email:         input["email"].(string),
+		Password:      input["password"].(string),
+		Firstname:     input["firstname"].(string),
+		Surname:       input["surname"].(string),
+		MobilePhone:   input["mobile_phone"].(string),
+		WalletAddress: input["wallet_address"].(string),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
-	id, err := r.DbInstance.InsertUser(context.Background(), insertParams)
+	fmt.Println("herree", insertParams)
+	id, err := r.DbInstance.InsertUserIdentity(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
 	}
-	return r.DbInstance.GetUserByID(context.Background(), id)
+	fmt.Println("here")
+	return r.DbInstance.GetUserIdentityByID(context.Background(), id)
 }
 
-func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface{}, error) {
-	input := params.Args["input"].(map[string]interface{})
-	insertParams := db.InsertProjectParams{
-		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
-		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
-		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
-		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		OrderDate:   sql.NullTime{Time: time.Now(), Valid: true},
-		UserID:      int32(input["user_id"].(int)),
-		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
-	}
-	id, err := r.DbInstance.InsertProject(context.Background(), insertParams)
-	if err != nil {
-		return nil, err
-	}
-	return r.DbInstance.GetProjectByID(context.Background(), id)
-}
-
-func (r *Resolver) ResolveInsertProjectComment(params graphql.ResolveParams) (interface{}, error) {
-	input := params.Args["input"].(map[string]interface{})
-	insertParams := db.InsertProjectCommentParams{
-		UserID:    int32(input["user_id"].(int)),
-		ProjectID: int32(input["project_id"].(int)),
-		Date:      sql.NullTime{Time: time.Now(), Valid: true},
-		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
-	}
-	id, err := r.DbInstance.InsertProjectComment(context.Background(), insertParams)
-	if err != nil {
-		return nil, err
-	}
-	return r.DbInstance.GetProjectCommentByID(context.Background(), id)
+func (r *Resolver) ResolveGetUserByID(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int)
+	return r.DbInstance.GetUserIdentityByID(context.Background(), int64(id))
 }
 
 func (r *Resolver) ResolveDeleteUser(params graphql.ResolveParams) (interface{}, error) {
 	id := params.Args["id"].(int)
-	err := r.DbInstance.DeleteUserByID(context.Background(), int32(id))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-func (r *Resolver) ResolveDeleteProject(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	err := r.DbInstance.DeleteProjectByID(context.Background(), int32(id))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-func (r *Resolver) ResolveDeleteProjectComment(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	err := r.DbInstance.DeleteProjectCommentByID(context.Background(), int32(id))
+	err := r.DbInstance.DeleteUserIdentityByID(context.Background(), int64(id))
 	if err != nil {
 		return false, err
 	}
@@ -115,104 +58,75 @@ func (r *Resolver) ResolveDeleteProjectComment(params graphql.ResolveParams) (in
 
 func (r *Resolver) ResolveUpdateUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateUserByIDParams{
-		ID:          int32(input["id"].(int)),
+	updateParams := db.UpdateUserIdentityByIDParams{
+		ID:          int64(input["id"].(int)),
 		Email:       input["email"].(string),
 		Password:    input["password"].(string),
-		Firstname:   sql.NullString{String: input["firstname"].(string), Valid: input["firstname"] != nil},
-		Surname:     sql.NullString{String: input["surname"].(string), Valid: input["surname"] != nil},
-		MobilePhone: sql.NullString{String: input["mobilePhone"].(string), Valid: input["mobilePhone"] != nil},
+		Firstname:   input["firstname"].(string),
+		Surname:     input["surname"].(string),
+		MobilePhone: input["mobile_phone"].(string),
+		UpdatedAt:   time.Now(),
 	}
-	_, err := r.DbInstance.UpdateUserByID(context.Background(), updateParams)
+	_, err := r.DbInstance.UpdateUserIdentityByID(context.Background(), updateParams)
 	if err != nil {
 		return nil, err
 	}
-	return r.DbInstance.GetUserByID(context.Background(), updateParams.ID)
-}
-
-func (r *Resolver) ResolveUpdateProject(params graphql.ResolveParams) (interface{}, error) {
-	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateProjectByIDParams{
-		ID:          int32(input["id"].(int)),
-		Title:       sql.NullString{String: input["title"].(string), Valid: input["title"] != nil},
-		Description: sql.NullString{String: input["description"].(string), Valid: input["description"] != nil},
-		TotalAmount: sql.NullString{String: input["total_amount"].(string), Valid: input["total_amount"] != nil},
-		Status:      sql.NullBool{Bool: input["status"].(bool), Valid: input["status"] != nil},
-		OrderDate:   sql.NullTime{Time: time.Now(), Valid: true},
-		UserID:      int32(input["user_id"].(int)),
-		Fee:         sql.NullString{String: input["fee"].(string), Valid: input["fee"] != nil},
-	}
-	_, err := r.DbInstance.UpdateProjectByID(context.Background(), updateParams)
-	if err != nil {
-		return nil, err
-	}
-	return r.DbInstance.GetProjectByID(context.Background(), updateParams.ID)
-}
-
-func (r *Resolver) ResolveUpdateProjectComment(params graphql.ResolveParams) (interface{}, error) {
-	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateProjectCommentByIDParams{
-		ID:        int32(input["id"].(int)),
-		UserID:    int32(input["user_id"].(int)),
-		ProjectID: int32(input["project_id"].(int)),
-		Date:      sql.NullTime{Time: time.Now(), Valid: true},
-		Text:      sql.NullString{String: input["text"].(string), Valid: input["text"] != nil},
-	}
-	_, err := r.DbInstance.UpdateProjectCommentByID(context.Background(), updateParams)
-	if err != nil {
-		return nil, err
-	}
-	return r.DbInstance.GetProjectCommentByID(context.Background(), updateParams.ID)
+	return r.DbInstance.GetUserIdentityByID(context.Background(), updateParams.ID)
 }
 
 func (r *Resolver) ResolveGetUsers(params graphql.ResolveParams) (interface{}, error) {
-	return r.DbInstance.GetUsers(context.Background())
+	return r.DbInstance.GetUsersIdentity(context.Background())
 }
 
-func (r *Resolver) ResolveGetProjects(params graphql.ResolveParams) (interface{}, error) {
-	return r.DbInstance.GetProjects(context.Background())
-}
-
-func (r *Resolver) ResolveGetAssignedProjectByID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["project_id"].(int)
-	return r.DbInstance.GetAssignedProjectByID(context.Background(), int32(id))
-}
-func (r *Resolver) ResolveGetAssignedProjects(params graphql.ResolveParams) (interface{}, error) {
-	return r.DbInstance.GetAssignedProjects(context.Background())
-}
-
-func (r *Resolver) ResolveInsertAssignedProject(params graphql.ResolveParams) (interface{}, error) {
-
+func (r *Resolver) ResolveInsertUserProfile(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	insertParams := db.InsertAssignedProjectParams{
-		UserID:    int32(input["user_id"].(int)),
-		ProjectID: int32(input["project_id"].(int)),
-		Issued:    sql.NullBool{Bool: input["issued"].(bool), Valid: input["issued"] != nil},
+	insertParams := db.InsertUserProfileParams{
+		UserID:           int64(input["user_id"].(int)),
+		Rating:           int64(input["rating"].(int)),
+		Description:      sql.NullString{String: input["description"].(string), Valid: true},
+		DoneProjects:     int64(input["done_projects"].(int)),
+		GivenProjects:    int64(input["given_projects"].(int)),
+		RecommendationID: sql.NullInt64{Int64: input["recommendation_id"].(int64), Valid: true},
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
-	id, err := r.DbInstance.InsertAssignedProject(context.Background(), insertParams)
+
+	id, err := r.DbInstance.InsertUserProfile(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
 	}
-	return r.DbInstance.GetAssignedProjectByID(context.Background(), id)
+
+	return r.DbInstance.GetUserProfileByUserID(context.Background(), id)
 }
 
-func (r *Resolver) ResolveUpdateAssignedProject(params graphql.ResolveParams) (interface{}, error) {
+func (r *Resolver) ResolveGetUserProfile(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int64)
+	return r.DbInstance.GetUserProfileByUserID(context.Background(), id)
+}
+
+func (r *Resolver) ResolveUpdateUserProfile(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateAssignedProjectByIDParams{
-		UserID:    int32(input["user_id"].(int)),
-		ProjectID: int32(input["project_id"].(int)),
-		Issued:    sql.NullBool{Bool: input["issued"].(bool), Valid: input["issued"] != nil},
+	updateParams := db.UpdateUserProfileParams{
+		UserID:           int64(input["user_id"].(int)),
+		Rating:           input["rating"].(int64),
+		Description:      sql.NullString{String: input["description"].(string), Valid: true},
+		DoneProjects:     input["done_projects"].(int64),
+		GivenProjects:    input["given_projects"].(int64),
+		RecommendationID: sql.NullInt64{Int64: input["recommendation_id"].(int64), Valid: true},
+		UpdatedAt:        time.Now(),
 	}
-	_, err := r.DbInstance.UpdateAssignedProjectByID(context.Background(), updateParams)
+
+	_, err := r.DbInstance.UpdateUserProfile(context.Background(), updateParams)
 	if err != nil {
 		return nil, err
 	}
-	return r.DbInstance.GetAssignedProjectByID(context.Background(), updateParams.ProjectID)
+
+	return r.DbInstance.GetUserProfileByUserID(context.Background(), updateParams.UserID)
 }
 
-func (r *Resolver) ResolveDeleteAssignedProject(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["project_id"].(int)
-	err := r.DbInstance.DeleteAssignedProjectByID(context.Background(), int32(id))
+func (r *Resolver) ResolveDeleteUserProfile(params graphql.ResolveParams) (interface{}, error) {
+	id := params.Args["id"].(int64)
+	err := r.DbInstance.DeleteUserProfileByID(context.Background(), id)
 	if err != nil {
 		return false, err
 	}

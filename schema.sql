@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS user_identity (
     firstname TEXT NOT NULL,
     surname TEXT NOT NULL,
     mobile_phone TEXT NOT NULL UNIQUE,
-    wallet_address BIGINT NOT NULL UNIQUE,
+    wallet_address TEXT NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,21 +1,21 @@
--- name: DeleteUserByID :exec
+-- name: DeleteUserIdentityByID :exec
 DELETE FROM user_identity WHERE id = $1;
 
--- name: UpdateUserByID :one
+-- name: UpdateUserIdentityByID :one
 UPDATE user_identity
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5
-WHERE id = $6
+SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
+WHERE id = $7
 RETURNING id;
 
--- name: GetUserByID :one
+-- name: GetUserIdentityByID :one
 SELECT * FROM user_identity WHERE id = $1;
 
--- name: GetUsers :many
+-- name: GetUsersIdentity :many
 SELECT * FROM user_identity;
 
--- name: InsertUser :one
-INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address)
-VALUES ($1, $2, $3, $4, $5, $6)
+-- name: InsertUserIdentity :one
+INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id;
 
 -- name: DeleteProjectByID :exec
@@ -74,17 +74,20 @@ SELECT * FROM assign_project WHERE project_id = $1;
 
 -- name: UpdateUserProfile :one
 UPDATE user_profile
-SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5
-WHERE user_id = $6
+SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5, updated_at = $6
+WHERE user_id = $7
 RETURNING user_id;
 
 -- name: GetUserProfileByUserID :one
 SELECT * FROM user_profile WHERE user_id = $1;
 
 -- name: InsertUserProfile :one
-INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id,created_at,updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING user_id;
+
+-- name: DeleteUserProfileByID :exec
+DELETE FROM user_profile WHERE user_id = $1;
 
 -- name: DeleteUserRecommendation :exec
 DELETE FROM user_recommendation WHERE given_id = $1 AND received_id = $2;
