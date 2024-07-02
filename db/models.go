@@ -46,7 +46,7 @@ type UserIdentity struct {
 	ID            int64     `json:"id"`
 	Email         string    `json:"email"`
 	Password      string    `json:"password"`
-	Firstname     string    `json:"firstname"`
+	FirstName     string    `json:"first_name"`
 	Surname       string    `json:"surname"`
 	MobilePhone   string    `json:"mobile_phone"`
 	WalletAddress string    `json:"wallet_address"`
@@ -58,8 +58,8 @@ type UserProfile struct {
 	UserID           int64          `json:"user_id"`
 	Rating           int64          `json:"rating"`
 	Description      sql.NullString `json:"description"`
-	DoneProjects     int64          `json:"done_projects"`
-	GivenProjects    int64          `json:"given_projects"`
+	DoneProject      int64          `json:"done_project"`
+	GivenProject     int64          `json:"given_project"`
 	RecommendationID sql.NullInt64  `json:"recommendation_id"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`

@@ -46,7 +46,7 @@ func seedDatabase(instance *db.Queries, ctx context.Context, insertedCount *int)
 		return err
 	}
 
-	for i := 1; i < 1000; i++ {
+	for i := 1; i < 10; i++ {
 		if err := addFixtureData(instance, ctx, i); err != nil {
 			return err
 		}

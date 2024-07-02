@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS project (
     id BIGSERIAL PRIMARY KEY,
     description TEXT NOT NULL,
     title TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS comments (
+CREATE TABLE IF NOT EXISTS comment (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS user_identity (
     id BIGSERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    firstname TEXT NOT NULL,
+    first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
     mobile_phone TEXT NOT NULL UNIQUE,
     wallet_address TEXT NOT NULL UNIQUE,
@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS user_profile (
     user_id BIGINT PRIMARY KEY,
     rating BIGINT NOT NULL DEFAULT 0,
     description TEXT,
-    done_projects BIGINT NOT NULL DEFAULT 0,
-    given_projects BIGINT NOT NULL DEFAULT 0,
+    done_project BIGINT NOT NULL DEFAULT 0,
+    given_project BIGINT NOT NULL DEFAULT 0,
     recommendation_id BIGINT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -62,14 +62,14 @@ CREATE TABLE IF NOT EXISTS category (
     title TEXT NOT NULL UNIQUE
 );
 
-ALTER TABLE projects ADD CONSTRAINT projects_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
-ALTER TABLE projects ADD CONSTRAINT projects_fk_category FOREIGN KEY (categories) REFERENCES category(id);
+ALTER TABLE project ADD CONSTRAINT project_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
+ALTER TABLE project ADD CONSTRAINT project_fk_category FOREIGN KEY (categories) REFERENCES category(id);
 
-ALTER TABLE comments ADD CONSTRAINT comments_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
-ALTER TABLE comments ADD CONSTRAINT comments_fk_project FOREIGN KEY (project_id) REFERENCES projects(id);
+ALTER TABLE comment ADD CONSTRAINT comment_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
+ALTER TABLE comment ADD CONSTRAINT comment_fk_project FOREIGN KEY (project_id) REFERENCES project(id);
 
 ALTER TABLE assign_project ADD CONSTRAINT assign_project_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
-ALTER TABLE assign_project ADD CONSTRAINT assign_project_fk_project FOREIGN KEY (project_id) REFERENCES projects(id);
+ALTER TABLE assign_project ADD CONSTRAINT assign_project_fk_project FOREIGN KEY (project_id) REFERENCES project(id);
 
 ALTER TABLE user_profile ADD CONSTRAINT user_profile_fk_user FOREIGN KEY (user_id) REFERENCES user_identity(id);
 ALTER TABLE user_profile ADD CONSTRAINT user_profile_fk_recommendation FOREIGN KEY (recommendation_id) REFERENCES user_recommendation(given_id);
