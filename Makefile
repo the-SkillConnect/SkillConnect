@@ -1,11 +1,14 @@
 test:
-	go test ./... -v
+	@go test ./... -v
 
 build:
-	go build -o ./bin/skillConnect ./*.go
+	@go build -o ./bin/skillConnect ./*.go
 
 run: build
-	./bin/skillConnect
+	@./bin/skillConnect
 	
 sqlc: 
-	sqlc generate
+	@sqlc generate
+
+seed:
+	@go run scripts/seed.go

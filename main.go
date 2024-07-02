@@ -14,7 +14,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	if err = db.CreateTables(dbInstance); err != nil {
+		log.Fatal(err)
+	}
 	instance := db.New(dbInstance)
 
 	schema, err := graphql.NewSchema(instance)
