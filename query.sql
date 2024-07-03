@@ -22,9 +22,15 @@ RETURNING id;
 DELETE FROM projects WHERE id = $1;
 
 -- name: UpdateProjectByID :one
+<<<<<<< Updated upstream
 UPDATE projects
 SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, categories = $7
 WHERE id = $8
+=======
+UPDATE project
+SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, category_id = $7, updated_at = $8
+WHERE id = $9
+>>>>>>> Stashed changes
 RETURNING id;
 
 -- name: GetProjectByID :one
@@ -34,8 +40,13 @@ SELECT * FROM projects WHERE id = $1;
 SELECT * FROM projects;
 
 -- name: InsertProject :one
+<<<<<<< Updated upstream
 INSERT INTO projects (description, title, total_amount, done_status, user_id, fee, categories)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
+=======
+INSERT INTO project (description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+>>>>>>> Stashed changes
 RETURNING id;
 
 -- name: DeleteCommentByID :exec
@@ -62,8 +73,8 @@ RETURNING id;
 DELETE FROM assign_project WHERE user_id = $1 AND project_id = $2;
 
 -- name: InsertAssignProject :one
-INSERT INTO assign_project (user_id, project_id)
-VALUES ($1, $2)
+INSERT INTO assign_project (user_id, project_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4)
 RETURNING user_id, project_id;
 
 -- name: GetAssignedProjectsByUserID :many
@@ -74,16 +85,26 @@ SELECT * FROM assign_project WHERE project_id = $1;
 
 -- name: UpdateUserProfile :one
 UPDATE user_profile
+<<<<<<< Updated upstream
 SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5, updated_at = $6
 WHERE user_id = $7
+=======
+SET rating = $1, description = $2, done_project = $3, given_project = $4, updated_at = $5
+WHERE user_id = $6
+>>>>>>> Stashed changes
 RETURNING user_id;
 
 -- name: GetUserProfileByUserID :one
 SELECT * FROM user_profile WHERE user_id = $1;
 
 -- name: InsertUserProfile :one
+<<<<<<< Updated upstream
 INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id,created_at,updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+=======
+INSERT INTO user_profile (user_id, rating, description, done_project, given_project, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+>>>>>>> Stashed changes
 RETURNING user_id;
 
 -- name: DeleteUserProfileByID :exec
@@ -93,8 +114,8 @@ DELETE FROM user_profile WHERE user_id = $1;
 DELETE FROM user_recommendation WHERE given_id = $1 AND received_id = $2;
 
 -- name: InsertUserRecommendation :one
-INSERT INTO user_recommendation (given_id, received_id, description)
-VALUES ($1, $2, $3)
+INSERT INTO user_recommendation (given_id, received_id, description, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING given_id, received_id;
 
 -- name: GetUserRecommendationByGivenID :one
@@ -149,14 +170,14 @@ SELECT
     p.done_status,
     p.user_id,
     p.fee,
-    p.categories,
+    p.category_id,
     p.created_at,
     p.updated_at,
     c.title AS category_title
 FROM 
     projects p
 LEFT JOIN 
-    category c ON p.categories = c.id
+    category c ON p.category_id = c.id
 WHERE 
     p.id = $1;
 

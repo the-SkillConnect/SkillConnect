@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -11,65 +11,45 @@ import (
 )
 
 func main() {
-	var insertedCount int = 5
 	now := time.Now()
-
-	go logSeedingProgress(now, &insertedCount)
-
+	var i int
+	go func() {
+		for {
+			<-time.After(time.Millisecond * 500)
+			fmt.Printf("Seed Elapsed: %v, inserted: %d\n", time.Since(now), i)
+		}
+	}()
 	dbInstance, err := db.InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	setupDatabase(dbInstance)
-
-	instance := db.New(dbInstance)
-	ctx := context.Background()
-
-	seedDatabase(instance, ctx, &insertedCount)
-	log.Printf("Seed Ended in %v\n", time.Since(now))
-}
-
-func setupDatabase(dbInstance *sql.DB) error {
 	db.TearDown(dbInstance)
-	return db.CreateTables(dbInstance)
-}
+	db.CreateTables(dbInstance)
+	ctx := context.Background()
+	instance := db.New(dbInstance)
+	fixtures.AddCategory(*instance, ctx)
 
-func logSeedingProgress(startTime time.Time, insertedCount *int) {
-	for {
-		time.Sleep(500 * time.Millisecond)
-		log.Printf("Seed Elapsed: %v, inserted: %d\n", time.Since(startTime), *insertedCount)
-	}
-}
-
-func seedDatabase(instance *db.Queries, ctx context.Context, insertedCount *int) error {
-	if err := fixtures.AddCategory(*instance, ctx); err != nil {
-		return err
-	}
-
+<<<<<<< Updated upstream
 	for i := 1; i < 1000; i++ {
 		if err := addFixtureData(instance, ctx, i); err != nil {
 			return err
+=======
+	for i = 1; i < 10; i++ {
+		fixtures.AddUserIdentity(*instance, ctx, i)
+		err := fixtures.AddUserProfile(*instance, ctx, i)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+>>>>>>> Stashed changes
 		}
-		*insertedCount = i
+		fixtures.AddUserRecommendation(*instance, ctx, i)
+		fixtures.AddProject(*instance, ctx, i)
+		fixtures.AddComment(*instance, ctx, i)
+		fixtures.AddAssignProject(*instance, ctx, i)
 	}
-	return nil
-}
-
-func addFixtureData(instance *db.Queries, ctx context.Context, i int) error {
-	if err := fixtures.AddUserIdentity(*instance, ctx, i); err != nil {
-		return err
-	}
-	if err := fixtures.AddUserProfile(*instance, ctx, i); err != nil {
-		return err
-	}
-	if err := fixtures.AddUserRecommendation(*instance, ctx, i); err != nil {
-		return err
-	}
-	if err := fixtures.AddProject(*instance, ctx, i); err != nil {
-		return err
-	}
-	if err := fixtures.AddComment(*instance, ctx, i); err != nil {
-		return err
-	}
+<<<<<<< Updated upstream
 	return fixtures.AddAssignProject(*instance, ctx, i)
 }
+=======
+	fmt.Printf("Seed Ended in %v\n", time.Since(now))
+}
+>>>>>>> Stashed changes

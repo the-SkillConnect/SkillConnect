@@ -73,8 +73,8 @@ func TearDown(db *sql.DB) {
 	db.Exec("DROP TABLE IF EXISTS user_identity")
 	db.Exec("DROP TABLE IF EXISTS user_profile")
 	db.Exec("DROP TABLE IF EXISTS user_recommendation")
-	db.Exec("DROP TABLE IF EXISTS Projects")
-	db.Exec("DROP TABLE IF EXISTS comments")
+	db.Exec("DROP TABLE IF EXISTS Project")
+	db.Exec("DROP TABLE IF EXISTS comment")
 	db.Exec("DROP TABLE IF EXISTS assign_project")
 	db.Exec("DROP TABLE IF EXISTS category")
 }
@@ -106,9 +106,8 @@ func CreateUserProfileTable(db *sql.DB) error {
 		user_id BIGINT PRIMARY KEY,
 		rating BIGINT NOT NULL DEFAULT 0,
 		description TEXT,
-		done_projects BIGINT NOT NULL DEFAULT 0,
-		given_projects BIGINT NOT NULL DEFAULT 0,
-		recommendation_id BIGINT,
+		done_project BIGINT NOT NULL DEFAULT 0,
+		given_project BIGINT NOT NULL DEFAULT 0,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
@@ -126,6 +125,8 @@ func CreateUserRecommendationTable(db *sql.DB) error {
 		given_id BIGINT NOT NULL,
 		received_id BIGINT NOT NULL,
 		description TEXT NOT NULL,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		PRIMARY KEY (given_id, received_id)
 	);
 	`
@@ -146,7 +147,7 @@ func CreateProjectTable(db *sql.DB) error {
 		done_status BOOLEAN DEFAULT FALSE,
 		user_id BIGINT NOT NULL,
 		fee NUMERIC(10,2) NOT NULL,
-		categories BIGINT,
+		category_id BIGINT,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);

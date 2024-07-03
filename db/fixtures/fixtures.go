@@ -69,7 +69,9 @@ func AddProject(store db.Queries, ctx context.Context, i int) error {
 		DoneStatus:  sql.NullBool{Bool: false, Valid: true},
 		UserID:      int64(rID),
 		Fee:         fmt.Sprintf("%.3f", rand.Float64()*float64(i)),
-		Categories:  sql.NullInt64{Int64: int64(rand.Intn(len(Categories) + 1)), Valid: true},
+		CategoryID:  sql.NullInt64{Int64: int64(rand.Intn(len(Categories) + 1)), Valid: true},
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 	_, err := store.InsertProject(ctx, arg)
 	return err
@@ -93,6 +95,8 @@ func AddAssignProject(store db.Queries, ctx context.Context, i int) error {
 	arg := db.InsertAssignProjectParams{
 		UserID:    int64(i),
 		ProjectID: int64(rID),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	_, err := store.InsertAssignProject(ctx, arg)
 	return err
