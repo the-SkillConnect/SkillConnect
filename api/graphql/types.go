@@ -16,7 +16,7 @@ var UserIdentityType = graphql.NewObject(graphql.ObjectConfig{
 		"id":             &graphql.Field{Type: graphql.Int},
 		"email":          &graphql.Field{Type: graphql.String},
 		"password":       &graphql.Field{Type: graphql.String},
-		"firstname":      &graphql.Field{Type: graphql.String},
+		"first_name":     &graphql.Field{Type: graphql.String},
 		"surname":        &graphql.Field{Type: graphql.String},
 		"mobile_phone":   &graphql.Field{Type: graphql.String},
 		"wallet_address": &graphql.Field{Type: graphql.String},
@@ -30,7 +30,7 @@ var InsertUserIdentityInputType = graphql.NewInputObject(graphql.InputObjectConf
 	Fields: graphql.InputObjectConfigFieldMap{
 		"email":          &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
 		"password":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
-		"firstname":      &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"first_name":     &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"surname":        &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"mobile_phone":   &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"wallet_address": &graphql.InputObjectFieldConfig{Type: graphql.String},
@@ -43,7 +43,7 @@ var UpdateUserIdentityInputType = graphql.NewInputObject(graphql.InputObjectConf
 		"id":           &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"email":        &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
 		"password":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
-		"firstname":    &graphql.InputObjectFieldConfig{Type: graphql.String},
+		"first_name":   &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"surname":      &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"mobile_phone": &graphql.InputObjectFieldConfig{Type: graphql.String},
 	},
@@ -52,16 +52,6 @@ var UpdateUserIdentityInputType = graphql.NewInputObject(graphql.InputObjectConf
 var UserProfileType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "UserProfile",
 	Fields: graphql.Fields{
-<<<<<<< Updated upstream
-		"userID":           &graphql.Field{Type: graphql.Int},
-		"rating":           &graphql.Field{Type: graphql.Int},
-		"description":      &graphql.Field{Type: graphql.String},
-		"doneProjects":     &graphql.Field{Type: graphql.Int},
-		"givenProjects":    &graphql.Field{Type: graphql.Int},
-		"recommendationID": &graphql.Field{Type: graphql.Int},
-		"createdAt":        &graphql.Field{Type: graphql.DateTime},
-		"updatedAt":        &graphql.Field{Type: graphql.DateTime},
-=======
 		"userID":       &graphql.Field{Type: graphql.Int},
 		"rating":       &graphql.Field{Type: graphql.Int},
 		"description":  &graphql.Field{Type: graphql.String},
@@ -69,43 +59,23 @@ var UserProfileType = graphql.NewObject(graphql.ObjectConfig{
 		"givenProject": &graphql.Field{Type: graphql.Int},
 		"createdAt":    &graphql.Field{Type: graphql.DateTime},
 		"updatedAt":    &graphql.Field{Type: graphql.DateTime},
->>>>>>> Stashed changes
 	},
 })
 
 var InsertUserProfileInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InsertUserProfileInput",
 	Fields: graphql.InputObjectConfigFieldMap{
-<<<<<<< Updated upstream
-		"user_id":           &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"rating":            &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"description":       &graphql.InputObjectFieldConfig{Type: graphql.String},
-		"done_projects":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"given_projects":    &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"recommendation_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
-=======
 		"user_id":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"rating":        &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"description":   &graphql.InputObjectFieldConfig{Type: graphql.String},
 		"done_project":  &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"given_project": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
->>>>>>> Stashed changes
 	},
 })
 
 var UpdateUserProfileInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "UpdateUserProfileInput",
 	Fields: graphql.InputObjectConfigFieldMap{
-<<<<<<< Updated upstream
-		"user_id":           &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"rating":            &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"description":       &graphql.InputObjectFieldConfig{Type: graphql.String},
-		"done_projects":     &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"given_projects":    &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
-		"recommendation_id": &graphql.InputObjectFieldConfig{Type: graphql.Int},
-	},
-})
-=======
 		"user_id":       &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"rating":        &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"description":   &graphql.InputObjectFieldConfig{Type: graphql.String},
@@ -245,4 +215,3 @@ var InsertCategoryInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		"title": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
 	},
 })
->>>>>>> Stashed changes

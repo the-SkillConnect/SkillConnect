@@ -32,8 +32,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveGetUserProfile,
 				},
-<<<<<<< Updated upstream
-=======
 				// Project queries
 				"project": &graphql.Field{
 					Type: ProjectType,
@@ -77,7 +75,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					Type:    graphql.NewList(CategoryType),
 					Resolve: resolver.ResolveGetCategories,
 				},
->>>>>>> Stashed changes
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
@@ -127,8 +124,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveDeleteUserProfile,
 				},
-<<<<<<< Updated upstream
-=======
 				// Project mutations
 				"insertProject": &graphql.Field{
 					Type: ProjectType,
@@ -202,7 +197,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveDeleteCategory,
 				},
->>>>>>> Stashed changes
 			},
 		}),
 	})

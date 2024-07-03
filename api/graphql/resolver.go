@@ -26,7 +26,7 @@ func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{},
 	insertParams := db.InsertUserIdentityParams{
 		Email:         input["email"].(string),
 		Password:      input["password"].(string),
-		Firstname:     input["firstname"].(string),
+		FirstName:     input["first_name"].(string),
 		Surname:       input["surname"].(string),
 		MobilePhone:   input["mobile_phone"].(string),
 		WalletAddress: input["wallet_address"].(string),
@@ -62,7 +62,7 @@ func (r *Resolver) ResolveUpdateUser(params graphql.ResolveParams) (interface{},
 		ID:          int64(input["id"].(int)),
 		Email:       input["email"].(string),
 		Password:    input["password"].(string),
-		Firstname:   input["firstname"].(string),
+		FirstName:   input["first_name"].(string),
 		Surname:     input["surname"].(string),
 		MobilePhone: input["mobile_phone"].(string),
 		UpdatedAt:   time.Now(),
@@ -81,16 +81,6 @@ func (r *Resolver) ResolveGetUsersIdentity(params graphql.ResolveParams) (interf
 func (r *Resolver) ResolveInsertUserProfile(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
 	insertParams := db.InsertUserProfileParams{
-<<<<<<< Updated upstream
-		UserID:           int64(input["user_id"].(int)),
-		Rating:           int64(input["rating"].(int)),
-		Description:      sql.NullString{String: input["description"].(string), Valid: true},
-		DoneProjects:     int64(input["done_projects"].(int)),
-		GivenProjects:    int64(input["given_projects"].(int)),
-		RecommendationID: sql.NullInt64{Int64: input["recommendation_id"].(int64), Valid: true},
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
-=======
 		UserID:       int64(input["user_id"].(int)),
 		Rating:       int64(input["rating"].(int)),
 		Description:  sql.NullString{String: input["description"].(string), Valid: true},
@@ -98,7 +88,6 @@ func (r *Resolver) ResolveInsertUserProfile(params graphql.ResolveParams) (inter
 		GivenProject: int64(input["given_project"].(int)),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
->>>>>>> Stashed changes
 	}
 
 	id, err := r.DbInstance.InsertUserProfile(context.Background(), insertParams)
@@ -117,22 +106,12 @@ func (r *Resolver) ResolveGetUserProfile(params graphql.ResolveParams) (interfac
 func (r *Resolver) ResolveUpdateUserProfile(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
 	updateParams := db.UpdateUserProfileParams{
-<<<<<<< Updated upstream
-		UserID:           int64(input["user_id"].(int)),
-		Rating:           input["rating"].(int64),
-		Description:      sql.NullString{String: input["description"].(string), Valid: true},
-		DoneProjects:     input["done_projects"].(int64),
-		GivenProjects:    input["given_projects"].(int64),
-		RecommendationID: sql.NullInt64{Int64: input["recommendation_id"].(int64), Valid: true},
-		UpdatedAt:        time.Now(),
-=======
 		UserID:       int64(input["user_id"].(int)),
 		Rating:       input["rating"].(int64),
 		Description:  sql.NullString{String: input["description"].(string), Valid: true},
 		DoneProject:  input["done_project"].(int64),
 		GivenProject: input["given_project"].(int64),
 		UpdatedAt:    time.Now(),
->>>>>>> Stashed changes
 	}
 
 	_, err := r.DbInstance.UpdateUserProfile(context.Background(), updateParams)
@@ -151,8 +130,6 @@ func (r *Resolver) ResolveDeleteUserProfile(params graphql.ResolveParams) (inter
 	}
 	return true, nil
 }
-<<<<<<< Updated upstream
-=======
 
 func (r *Resolver) ResolveGetUserRecommendationByGivenID(params graphql.ResolveParams) (interface{}, error) {
 	givenID := params.Args["given_id"].(int)
@@ -359,4 +336,3 @@ func (r *Resolver) ResolveGetCategory(params graphql.ResolveParams) (interface{}
 	id := int32(params.Args["id"].(int))
 	return r.DbInstance.GetCategory(context.Background(), id)
 }
->>>>>>> Stashed changes

@@ -35,7 +35,7 @@ func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
 }
 
 const deleteCommentByID = `-- name: DeleteCommentByID :exec
-DELETE FROM comments WHERE id = $1
+DELETE FROM comment WHERE id = $1
 `
 
 func (q *Queries) DeleteCommentByID(ctx context.Context, id int64) error {
@@ -44,7 +44,7 @@ func (q *Queries) DeleteCommentByID(ctx context.Context, id int64) error {
 }
 
 const deleteProjectByID = `-- name: DeleteProjectByID :exec
-DELETE FROM projects WHERE id = $1
+DELETE FROM project WHERE id = $1
 `
 
 func (q *Queries) DeleteProjectByID(ctx context.Context, id int64) error {
@@ -84,12 +84,12 @@ func (q *Queries) DeleteUserRecommendation(ctx context.Context, arg DeleteUserRe
 	return err
 }
 
-const getAssignedProjectsByUserID = `-- name: GetAssignedProjectsByUserID :many
-SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE user_id = $1
+const getAssignedUsersByProjectID = `-- name: GetAssignedUsersByProjectID :many
+SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE project_id = $1
 `
 
-func (q *Queries) GetAssignedProjectsByUserID(ctx context.Context, userID int64) ([]AssignProject, error) {
-	rows, err := q.db.QueryContext(ctx, getAssignedProjectsByUserID, userID)
+func (q *Queries) GetAssignedUsersByProjectID(ctx context.Context, projectID int64) ([]AssignProject, error) {
+	rows, err := q.db.QueryContext(ctx, getAssignedUsersByProjectID, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +116,12 @@ func (q *Queries) GetAssignedProjectsByUserID(ctx context.Context, userID int64)
 	return items, nil
 }
 
-const getAssignedUsersByProjectID = `-- name: GetAssignedUsersByProjectID :many
-SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE project_id = $1
+const getAssignedprojectByUserID = `-- name: GetAssignedprojectByUserID :many
+SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE user_id = $1
 `
 
-func (q *Queries) GetAssignedUsersByProjectID(ctx context.Context, projectID int64) ([]AssignProject, error) {
-	rows, err := q.db.QueryContext(ctx, getAssignedUsersByProjectID, projectID)
+func (q *Queries) GetAssignedprojectByUserID(ctx context.Context, userID int64) ([]AssignProject, error) {
+	rows, err := q.db.QueryContext(ctx, getAssignedprojectByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 }
 
 const getCommentByID = `-- name: GetCommentByID :one
-SELECT id, user_id, project_id, date, text FROM comments WHERE id = $1
+SELECT id, user_id, project_id, date, text FROM comment WHERE id = $1
 `
 
 func (q *Queries) GetCommentByID(ctx context.Context, id int64) (Comment, error) {
@@ -203,103 +203,6 @@ func (q *Queries) GetCommentByID(ctx context.Context, id int64) (Comment, error)
 	return i, err
 }
 
-const getComments = `-- name: GetComments :many
-SELECT id, user_id, project_id, date, text FROM comments
-`
-
-func (q *Queries) GetComments(ctx context.Context) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, getComments)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Comment
-	for rows.Next() {
-		var i Comment
-		if err := rows.Scan(
-			&i.ID,
-			&i.UserID,
-			&i.ProjectID,
-			&i.Date,
-			&i.Text,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getCommentsWithUserAndProject = `-- name: GetCommentsWithUserAndProject :many
-SELECT 
-    c.id AS comment_id,
-    c.date,
-    c.text,
-    ui.id AS user_id,
-    ui.email,
-    ui.firstname,
-    ui.surname,
-    p.id AS project_id,
-    p.title
-FROM 
-    comments c
-JOIN 
-    user_identity ui ON c.user_id = ui.id
-JOIN 
-    projects p ON c.project_id = p.id
-`
-
-type GetCommentsWithUserAndProjectRow struct {
-	CommentID int64     `json:"comment_id"`
-	Date      time.Time `json:"date"`
-	Text      string    `json:"text"`
-	UserID    int64     `json:"user_id"`
-	Email     string    `json:"email"`
-	Firstname string    `json:"firstname"`
-	Surname   string    `json:"surname"`
-	ProjectID int64     `json:"project_id"`
-	Title     string    `json:"title"`
-}
-
-func (q *Queries) GetCommentsWithUserAndProject(ctx context.Context) ([]GetCommentsWithUserAndProjectRow, error) {
-	rows, err := q.db.QueryContext(ctx, getCommentsWithUserAndProject)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetCommentsWithUserAndProjectRow
-	for rows.Next() {
-		var i GetCommentsWithUserAndProjectRow
-		if err := rows.Scan(
-			&i.CommentID,
-			&i.Date,
-			&i.Text,
-			&i.UserID,
-			&i.Email,
-			&i.Firstname,
-			&i.Surname,
-			&i.ProjectID,
-			&i.Title,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getProjectAssignments = `-- name: GetProjectAssignments :many
 SELECT 
     ap.project_id,
@@ -307,16 +210,16 @@ SELECT
     ap.created_at,
     ap.updated_at,
     ui1.email AS assigned_user_email,
-    ui1.firstname AS assigned_user_firstname,
+    ui1.first_name AS assigned_user_first_name,
     ui1.surname AS assigned_user_surname,
     ui2.id AS project_owner_id,
     ui2.email AS project_owner_email,
-    ui2.firstname AS project_owner_firstname,
+    ui2.first_name AS project_owner_first_name,
     ui2.surname AS project_owner_surname
 FROM 
     assign_project ap
 JOIN 
-    projects p ON ap.project_id = p.id
+    project p ON ap.project_id = p.id
 JOIN 
     user_identity ui1 ON ap.user_id = ui1.id
 JOIN 
@@ -324,19 +227,6 @@ JOIN
 `
 
 type GetProjectAssignmentsRow struct {
-<<<<<<< Updated upstream
-	ProjectID             int64        `json:"project_id"`
-	AssignedUserID        int64        `json:"assigned_user_id"`
-	CreatedAt             time.Time    `json:"created_at"`
-	UpdatedAt             sql.NullTime `json:"updated_at"`
-	AssignedUserEmail     string       `json:"assigned_user_email"`
-	AssignedUserFirstname string       `json:"assigned_user_firstname"`
-	AssignedUserSurname   string       `json:"assigned_user_surname"`
-	ProjectOwnerID        int64        `json:"project_owner_id"`
-	ProjectOwnerEmail     string       `json:"project_owner_email"`
-	ProjectOwnerFirstname string       `json:"project_owner_firstname"`
-	ProjectOwnerSurname   string       `json:"project_owner_surname"`
-=======
 	ProjectID             int64     `json:"project_id"`
 	AssignedUserID        int64     `json:"assigned_user_id"`
 	CreatedAt             time.Time `json:"created_at"`
@@ -348,7 +238,6 @@ type GetProjectAssignmentsRow struct {
 	ProjectOwnerEmail     string    `json:"project_owner_email"`
 	ProjectOwnerFirstName string    `json:"project_owner_first_name"`
 	ProjectOwnerSurname   string    `json:"project_owner_surname"`
->>>>>>> Stashed changes
 }
 
 func (q *Queries) GetProjectAssignments(ctx context.Context) ([]GetProjectAssignmentsRow, error) {
@@ -366,11 +255,11 @@ func (q *Queries) GetProjectAssignments(ctx context.Context) ([]GetProjectAssign
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.AssignedUserEmail,
-			&i.AssignedUserFirstname,
+			&i.AssignedUserFirstName,
 			&i.AssignedUserSurname,
 			&i.ProjectOwnerID,
 			&i.ProjectOwnerEmail,
-			&i.ProjectOwnerFirstname,
+			&i.ProjectOwnerFirstName,
 			&i.ProjectOwnerSurname,
 		); err != nil {
 			return nil, err
@@ -387,11 +276,7 @@ func (q *Queries) GetProjectAssignments(ctx context.Context) ([]GetProjectAssign
 }
 
 const getProjectByID = `-- name: GetProjectByID :one
-<<<<<<< Updated upstream
-SELECT id, description, title, total_amount, done_status, user_id, fee, categories, created_at, updated_at FROM projects WHERE id = $1
-=======
 SELECT id, description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at FROM project WHERE id = $1
->>>>>>> Stashed changes
 `
 
 func (q *Queries) GetProjectByID(ctx context.Context, id int64) (Project, error) {
@@ -426,7 +311,7 @@ SELECT
     p.updated_at,
     c.title AS category_title
 FROM 
-    projects p
+    project p
 LEFT JOIN 
     category c ON p.category_id = c.id
 WHERE 
@@ -466,46 +351,8 @@ func (q *Queries) GetProjectDetails(ctx context.Context, id int64) (GetProjectDe
 	return i, err
 }
 
-const getProjects = `-- name: GetProjects :many
-SELECT id, description, title, total_amount, done_status, user_id, fee, categories, created_at, updated_at FROM projects
-`
-
-func (q *Queries) GetProjects(ctx context.Context) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getProjects)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Project
-	for rows.Next() {
-		var i Project
-		if err := rows.Scan(
-			&i.ID,
-			&i.Description,
-			&i.Title,
-			&i.TotalAmount,
-			&i.DoneStatus,
-			&i.UserID,
-			&i.Fee,
-			&i.Categories,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getUserIdentityByID = `-- name: GetUserIdentityByID :one
-SELECT id, email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity WHERE id = $1
+SELECT id, email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity WHERE id = $1
 `
 
 func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdentity, error) {
@@ -515,7 +362,7 @@ func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdenti
 		&i.ID,
 		&i.Email,
 		&i.Password,
-		&i.Firstname,
+		&i.FirstName,
 		&i.Surname,
 		&i.MobilePhone,
 		&i.WalletAddress,
@@ -526,11 +373,7 @@ func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdenti
 }
 
 const getUserProfileByUserID = `-- name: GetUserProfileByUserID :one
-<<<<<<< Updated upstream
-SELECT user_id, rating, description, done_projects, given_projects, recommendation_id, created_at, updated_at FROM user_profile WHERE user_id = $1
-=======
 SELECT user_id, rating, description, done_project, given_project, created_at, updated_at FROM user_profile WHERE user_id = $1
->>>>>>> Stashed changes
 `
 
 func (q *Queries) GetUserProfileByUserID(ctx context.Context, userID int64) (UserProfile, error) {
@@ -540,14 +383,8 @@ func (q *Queries) GetUserProfileByUserID(ctx context.Context, userID int64) (Use
 		&i.UserID,
 		&i.Rating,
 		&i.Description,
-<<<<<<< Updated upstream
-		&i.DoneProjects,
-		&i.GivenProjects,
-		&i.RecommendationID,
-=======
 		&i.DoneProject,
 		&i.GivenProject,
->>>>>>> Stashed changes
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -558,13 +395,13 @@ const getUserProfileWithDetails = `-- name: GetUserProfileWithDetails :one
 SELECT 
     ui.id AS user_id,
     ui.email,
-    ui.firstname,
+    ui.first_name,
     ui.surname,
     ui.mobile_phone,
     up.rating,
     up.description AS profile_description,
-    up.done_projects,
-    up.given_projects,
+    up.done_project,
+    up.given_project,
     ur.given_id,
     ur.received_id,
     ur.description AS recommendation_description
@@ -581,13 +418,13 @@ WHERE
 type GetUserProfileWithDetailsRow struct {
 	UserID                    int64          `json:"user_id"`
 	Email                     string         `json:"email"`
-	Firstname                 string         `json:"firstname"`
+	FirstName                 string         `json:"first_name"`
 	Surname                   string         `json:"surname"`
 	MobilePhone               string         `json:"mobile_phone"`
 	Rating                    int64          `json:"rating"`
 	ProfileDescription        sql.NullString `json:"profile_description"`
-	DoneProjects              int64          `json:"done_projects"`
-	GivenProjects             int64          `json:"given_projects"`
+	DoneProject               int64          `json:"done_project"`
+	GivenProject              int64          `json:"given_project"`
 	GivenID                   sql.NullInt64  `json:"given_id"`
 	ReceivedID                sql.NullInt64  `json:"received_id"`
 	RecommendationDescription sql.NullString `json:"recommendation_description"`
@@ -599,13 +436,13 @@ func (q *Queries) GetUserProfileWithDetails(ctx context.Context, id int64) (GetU
 	err := row.Scan(
 		&i.UserID,
 		&i.Email,
-		&i.Firstname,
+		&i.FirstName,
 		&i.Surname,
 		&i.MobilePhone,
 		&i.Rating,
 		&i.ProfileDescription,
-		&i.DoneProjects,
-		&i.GivenProjects,
+		&i.DoneProject,
+		&i.GivenProject,
 		&i.GivenID,
 		&i.ReceivedID,
 		&i.RecommendationDescription,
@@ -648,7 +485,7 @@ func (q *Queries) GetUserRecommendationByReceivedID(ctx context.Context, receive
 }
 
 const getUsersIdentity = `-- name: GetUsersIdentity :many
-SELECT id, email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity
+SELECT id, email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity
 `
 
 func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) {
@@ -664,7 +501,7 @@ func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) 
 			&i.ID,
 			&i.Email,
 			&i.Password,
-			&i.Firstname,
+			&i.FirstName,
 			&i.Surname,
 			&i.MobilePhone,
 			&i.WalletAddress,
@@ -684,8 +521,6 @@ func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) 
 	return items, nil
 }
 
-<<<<<<< Updated upstream
-=======
 const getcomment = `-- name: Getcomment :many
 SELECT id, user_id, project_id, date, text FROM comment
 `
@@ -821,7 +656,6 @@ func (q *Queries) Getproject(ctx context.Context) ([]Project, error) {
 	return items, nil
 }
 
->>>>>>> Stashed changes
 const insertAssignProject = `-- name: InsertAssignProject :one
 INSERT INTO assign_project (user_id, project_id, created_at, updated_at)
 VALUES ($1, $2, $3, $4)
@@ -866,7 +700,7 @@ func (q *Queries) InsertCategory(ctx context.Context, title string) (int32, erro
 }
 
 const insertComment = `-- name: InsertComment :one
-INSERT INTO comments (user_id, project_id, date, text)
+INSERT INTO comment (user_id, project_id, date, text)
 VALUES ($1, $2, $3, $4)
 RETURNING id
 `
@@ -891,13 +725,8 @@ func (q *Queries) InsertComment(ctx context.Context, arg InsertCommentParams) (i
 }
 
 const insertProject = `-- name: InsertProject :one
-<<<<<<< Updated upstream
-INSERT INTO projects (description, title, total_amount, done_status, user_id, fee, categories)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-=======
 INSERT INTO project (description, title, total_amount, done_status, user_id, fee, category_id,created_at,updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
->>>>>>> Stashed changes
 RETURNING id
 `
 
@@ -931,7 +760,7 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 }
 
 const insertUserIdentity = `-- name: InsertUserIdentity :one
-INSERT INTO user_identity (email, password, firstname, surname, mobile_phone, wallet_address, created_at, updated_at)
+INSERT INTO user_identity (email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id
 `
@@ -939,7 +768,7 @@ RETURNING id
 type InsertUserIdentityParams struct {
 	Email         string    `json:"email"`
 	Password      string    `json:"password"`
-	Firstname     string    `json:"firstname"`
+	FirstName     string    `json:"first_name"`
 	Surname       string    `json:"surname"`
 	MobilePhone   string    `json:"mobile_phone"`
 	WalletAddress string    `json:"wallet_address"`
@@ -951,7 +780,7 @@ func (q *Queries) InsertUserIdentity(ctx context.Context, arg InsertUserIdentity
 	row := q.db.QueryRowContext(ctx, insertUserIdentity,
 		arg.Email,
 		arg.Password,
-		arg.Firstname,
+		arg.FirstName,
 		arg.Surname,
 		arg.MobilePhone,
 		arg.WalletAddress,
@@ -964,27 +793,12 @@ func (q *Queries) InsertUserIdentity(ctx context.Context, arg InsertUserIdentity
 }
 
 const insertUserProfile = `-- name: InsertUserProfile :one
-<<<<<<< Updated upstream
-INSERT INTO user_profile (user_id, rating, description, done_projects, given_projects, recommendation_id,created_at,updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-=======
 INSERT INTO user_profile (user_id, rating, description, done_project, given_project, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
->>>>>>> Stashed changes
 RETURNING user_id
 `
 
 type InsertUserProfileParams struct {
-<<<<<<< Updated upstream
-	UserID           int64          `json:"user_id"`
-	Rating           int64          `json:"rating"`
-	Description      sql.NullString `json:"description"`
-	DoneProjects     int64          `json:"done_projects"`
-	GivenProjects    int64          `json:"given_projects"`
-	RecommendationID sql.NullInt64  `json:"recommendation_id"`
-	CreatedAt        time.Time      `json:"created_at"`
-	UpdatedAt        time.Time      `json:"updated_at"`
-=======
 	UserID       int64          `json:"user_id"`
 	Rating       int64          `json:"rating"`
 	Description  sql.NullString `json:"description"`
@@ -992,7 +806,6 @@ type InsertUserProfileParams struct {
 	GivenProject int64          `json:"given_project"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
->>>>>>> Stashed changes
 }
 
 func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfileParams) (int64, error) {
@@ -1000,14 +813,8 @@ func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfilePa
 		arg.UserID,
 		arg.Rating,
 		arg.Description,
-<<<<<<< Updated upstream
-		arg.DoneProjects,
-		arg.GivenProjects,
-		arg.RecommendationID,
-=======
 		arg.DoneProject,
 		arg.GivenProject,
->>>>>>> Stashed changes
 		arg.CreatedAt,
 		arg.UpdatedAt,
 	)
@@ -1049,7 +856,7 @@ func (q *Queries) InsertUserRecommendation(ctx context.Context, arg InsertUserRe
 }
 
 const updateCommentByID = `-- name: UpdateCommentByID :one
-UPDATE comments
+UPDATE comment
 SET user_id = $1, project_id = $2, date = $3, text = $4
 WHERE id = $5
 RETURNING id
@@ -1077,15 +884,9 @@ func (q *Queries) UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDPa
 }
 
 const updateProjectByID = `-- name: UpdateProjectByID :one
-<<<<<<< Updated upstream
-UPDATE projects
-SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, categories = $7
-WHERE id = $8
-=======
 UPDATE project
 SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, category_id = $7, updated_at = $8
 WHERE id = $9
->>>>>>> Stashed changes
 RETURNING id
 `
 
@@ -1120,7 +921,7 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 
 const updateUserIdentityByID = `-- name: UpdateUserIdentityByID :one
 UPDATE user_identity
-SET email = $1, password = $2, firstname = $3, surname = $4, mobile_phone = $5, updated_at = $6
+SET email = $1, password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
 WHERE id = $7
 RETURNING id
 `
@@ -1128,7 +929,7 @@ RETURNING id
 type UpdateUserIdentityByIDParams struct {
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
-	Firstname   string    `json:"firstname"`
+	FirstName   string    `json:"first_name"`
 	Surname     string    `json:"surname"`
 	MobilePhone string    `json:"mobile_phone"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -1139,7 +940,7 @@ func (q *Queries) UpdateUserIdentityByID(ctx context.Context, arg UpdateUserIden
 	row := q.db.QueryRowContext(ctx, updateUserIdentityByID,
 		arg.Email,
 		arg.Password,
-		arg.Firstname,
+		arg.FirstName,
 		arg.Surname,
 		arg.MobilePhone,
 		arg.UpdatedAt,
@@ -1152,47 +953,26 @@ func (q *Queries) UpdateUserIdentityByID(ctx context.Context, arg UpdateUserIden
 
 const updateUserProfile = `-- name: UpdateUserProfile :one
 UPDATE user_profile
-<<<<<<< Updated upstream
-SET rating = $1, description = $2, done_projects = $3, given_projects = $4, recommendation_id = $5, updated_at = $6
-WHERE user_id = $7
-=======
 SET rating = $1, description = $2, done_project = $3, given_project = $4, updated_at = $5
 WHERE user_id = $6
->>>>>>> Stashed changes
 RETURNING user_id
 `
 
 type UpdateUserProfileParams struct {
-<<<<<<< Updated upstream
-	Rating           int64          `json:"rating"`
-	Description      sql.NullString `json:"description"`
-	DoneProjects     int64          `json:"done_projects"`
-	GivenProjects    int64          `json:"given_projects"`
-	RecommendationID sql.NullInt64  `json:"recommendation_id"`
-	UpdatedAt        time.Time      `json:"updated_at"`
-	UserID           int64          `json:"user_id"`
-=======
 	Rating       int64          `json:"rating"`
 	Description  sql.NullString `json:"description"`
 	DoneProject  int64          `json:"done_project"`
 	GivenProject int64          `json:"given_project"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	UserID       int64          `json:"user_id"`
->>>>>>> Stashed changes
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateUserProfile,
 		arg.Rating,
 		arg.Description,
-<<<<<<< Updated upstream
-		arg.DoneProjects,
-		arg.GivenProjects,
-		arg.RecommendationID,
-=======
 		arg.DoneProject,
 		arg.GivenProject,
->>>>>>> Stashed changes
 		arg.UpdatedAt,
 		arg.UserID,
 	)

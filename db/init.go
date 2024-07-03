@@ -14,7 +14,7 @@ var (
 	ErrorCreateProjectTable       = errors.New("could not project table")
 	ErrorCreateComment            = errors.New("could not project comment table")
 	ErrorCreateCategory           = errors.New("could not category table")
-	ErrorCreateAssignedProject    = errors.New("could not project comment table")
+	ErrorCreateAssignedProject    = errors.New("could not project Assigned project table")
 )
 
 func InitDB() (*sql.DB, error) {
@@ -85,7 +85,7 @@ func CreateUserIdentityTable(db *sql.DB) error {
 		id BIGSERIAL PRIMARY KEY,
 		email TEXT NOT NULL UNIQUE,
 		password TEXT NOT NULL,
-		firstname TEXT NOT NULL,
+		first_name TEXT NOT NULL,
 		surname TEXT NOT NULL,
 		mobile_phone TEXT NOT NULL UNIQUE,
 		wallet_address TEXT NOT NULL UNIQUE,
@@ -139,7 +139,7 @@ func CreateUserRecommendationTable(db *sql.DB) error {
 
 func CreateProjectTable(db *sql.DB) error {
 	createProjectTable := `
-	CREATE TABLE IF NOT EXISTS projects (
+	CREATE TABLE IF NOT EXISTS project (
 		id BIGSERIAL PRIMARY KEY,
 		description TEXT NOT NULL,
 		title TEXT NOT NULL,
@@ -161,7 +161,7 @@ func CreateProjectTable(db *sql.DB) error {
 
 func CreateCommentTable(db *sql.DB) error {
 	createComment := `
-	CREATE TABLE IF NOT EXISTS comments (
+	CREATE TABLE IF NOT EXISTS comment (
 		id BIGSERIAL PRIMARY KEY,
 		user_id BIGINT NOT NULL,
 		project_id BIGINT NOT NULL,

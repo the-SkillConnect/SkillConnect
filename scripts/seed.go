@@ -29,27 +29,16 @@ func main() {
 	instance := db.New(dbInstance)
 	fixtures.AddCategory(*instance, ctx)
 
-<<<<<<< Updated upstream
-	for i := 1; i < 1000; i++ {
-		if err := addFixtureData(instance, ctx, i); err != nil {
-			return err
-=======
 	for i = 1; i < 10; i++ {
 		fixtures.AddUserIdentity(*instance, ctx, i)
 		err := fixtures.AddUserProfile(*instance, ctx, i)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
->>>>>>> Stashed changes
 		}
 		fixtures.AddUserRecommendation(*instance, ctx, i)
 		fixtures.AddProject(*instance, ctx, i)
 		fixtures.AddComment(*instance, ctx, i)
 		fixtures.AddAssignProject(*instance, ctx, i)
 	}
-<<<<<<< Updated upstream
-	return fixtures.AddAssignProject(*instance, ctx, i)
-}
-=======
 	fmt.Printf("Seed Ended in %v\n", time.Since(now))
 }
->>>>>>> Stashed changes

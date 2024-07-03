@@ -24,7 +24,7 @@ func AddUserIdentity(store db.Queries, ctx context.Context, i int) error {
 	arg := db.InsertUserIdentityParams{
 		Email:         fmt.Sprintf("user%d@james.com", i),
 		Password:      fmt.Sprintf("abcd%d%d%d%d", i, i, i, i),
-		Firstname:     fmt.Sprintf("user%d", i),
+		FirstName:     fmt.Sprintf("user%d", i),
 		Surname:       fmt.Sprintf("james%d", i),
 		MobilePhone:   fmt.Sprintf("%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
 		WalletAddress: fmt.Sprintf("secureWallet%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
@@ -37,13 +37,13 @@ func AddUserIdentity(store db.Queries, ctx context.Context, i int) error {
 
 func AddUserProfile(store db.Queries, ctx context.Context, i int) error {
 	arg := db.InsertUserProfileParams{
-		UserID:        int64(i),
-		Rating:        int64(rand.Intn(5)),
-		Description:   sql.NullString{String: fmt.Sprintf("this is a mock description for user %d", i), Valid: true},
-		DoneProjects:  int64(rand.Intn(20)),
-		GivenProjects: int64(rand.Intn(100)),
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		UserID:       int64(i),
+		Rating:       int64(rand.Intn(5)),
+		Description:  sql.NullString{String: fmt.Sprintf("this is a mock description for user %d", i), Valid: true},
+		DoneProject:  int64(rand.Intn(20)),
+		GivenProject: int64(rand.Intn(100)),
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 	_, err := store.InsertUserProfile(ctx, arg)
 	return err
