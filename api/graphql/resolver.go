@@ -157,6 +157,20 @@ func (r *Resolver) ResolveInsertUserRecommendation(params graphql.ResolveParams)
 	return r.DbInstance.GetUserRecommendationByGivenID(context.Background(), id.GivenID)
 }
 
+func (r *Resolver) ResolveDeleteUserRecommendation(params graphql.ResolveParams) (interface{}, error) {
+	input := params.Args["input"].(map[string]interface{})
+	deleteParams := db.DeleteUserRecommendationParams{
+		GivenID:    int64(input["given_id"].(int)),
+		ReceivedID: int64(input["received_id"].(int)),
+	}
+
+	err := r.DbInstance.DeleteUserRecommendation(context.Background(), deleteParams)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
 	insertParams := db.InsertProjectParams{

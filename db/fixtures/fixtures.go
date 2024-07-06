@@ -55,6 +55,8 @@ func AddUserRecommendation(store db.Queries, ctx context.Context, i int) error {
 		GivenID:     int64(i),
 		ReceivedID:  int64(rID),
 		Description: fmt.Sprintf("this is recom from user%d to user%d", int64(i), int64(rID)),
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 	_, err := store.InsertUserRecommendation(ctx, arg)
 	return err

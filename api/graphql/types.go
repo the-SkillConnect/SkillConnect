@@ -90,6 +90,8 @@ var UserRecommendationType = graphql.NewObject(graphql.ObjectConfig{
 		"given_id":    &graphql.Field{Type: graphql.Int},
 		"received_id": &graphql.Field{Type: graphql.Int},
 		"description": &graphql.Field{Type: graphql.String},
+		"created_at":  &graphql.Field{Type: graphql.DateTime},
+		"updated_at":  &graphql.Field{Type: graphql.DateTime},
 	},
 })
 
@@ -99,6 +101,14 @@ var InsertUserRecommendationInputType = graphql.NewInputObject(graphql.InputObje
 		"given_id":    &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"received_id": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 		"description": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
+	},
+})
+
+var DeleteUserRecommendationInputType = graphql.NewInputObject(graphql.InputObjectConfig{
+	Name: "DeleteUserRecommendationInput",
+	Fields: graphql.InputObjectConfigFieldMap{
+		"given_id":    &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
+		"received_id": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.Int)},
 	},
 })
 

@@ -1,2 +1,1 @@
--- name: GetCommentByID :one
-SELECT * FROM comment WHERE project_id = 3;
+SELECT * FROM user_recommendation WHERE given_id = 1;

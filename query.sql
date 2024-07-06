@@ -88,10 +88,10 @@ INSERT INTO user_recommendation (given_id, received_id, description, created_at,
 VALUES ($1, $2, $3, $4, $5)
 RETURNING given_id, received_id;
 
--- name: GetUserRecommendationByGivenID :one
+-- name: GetUserRecommendationByGivenID :many
 SELECT * FROM user_recommendation WHERE given_id = $1;
 
--- name: GetUserRecommendationByReceivedID :one
+-- name: GetUserRecommendationByReceivedID :many
 SELECT * FROM user_recommendation WHERE received_id = $1;
 
 -- name: InsertCategory :one

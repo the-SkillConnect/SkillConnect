@@ -505,38 +505,70 @@ func (q *Queries) GetUserProfileWithDetails(ctx context.Context) (GetUserProfile
 	return i, err
 }
 
-const getUserRecommendationByGivenID = `-- name: GetUserRecommendationByGivenID :one
+const getUserRecommendationByGivenID = `-- name: GetUserRecommendationByGivenID :many
 SELECT given_id, received_id, description, created_at, updated_at FROM user_recommendation WHERE given_id = $1
 `
 
-func (q *Queries) GetUserRecommendationByGivenID(ctx context.Context, givenID int64) (UserRecommendation, error) {
-	row := q.db.QueryRowContext(ctx, getUserRecommendationByGivenID, givenID)
-	var i UserRecommendation
-	err := row.Scan(
-		&i.GivenID,
-		&i.ReceivedID,
-		&i.Description,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+func (q *Queries) GetUserRecommendationByGivenID(ctx context.Context, givenID int64) ([]UserRecommendation, error) {
+	rows, err := q.db.QueryContext(ctx, getUserRecommendationByGivenID, givenID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserRecommendation
+	for rows.Next() {
+		var i UserRecommendation
+		if err := rows.Scan(
+			&i.GivenID,
+			&i.ReceivedID,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-const getUserRecommendationByReceivedID = `-- name: GetUserRecommendationByReceivedID :one
+const getUserRecommendationByReceivedID = `-- name: GetUserRecommendationByReceivedID :many
 SELECT given_id, received_id, description, created_at, updated_at FROM user_recommendation WHERE received_id = $1
 `
 
-func (q *Queries) GetUserRecommendationByReceivedID(ctx context.Context, receivedID int64) (UserRecommendation, error) {
-	row := q.db.QueryRowContext(ctx, getUserRecommendationByReceivedID, receivedID)
-	var i UserRecommendation
-	err := row.Scan(
-		&i.GivenID,
-		&i.ReceivedID,
-		&i.Description,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+func (q *Queries) GetUserRecommendationByReceivedID(ctx context.Context, receivedID int64) ([]UserRecommendation, error) {
+	rows, err := q.db.QueryContext(ctx, getUserRecommendationByReceivedID, receivedID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserRecommendation
+	for rows.Next() {
+		var i UserRecommendation
+		if err := rows.Scan(
+			&i.GivenID,
+			&i.ReceivedID,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUsersIdentity = `-- name: GetUsersIdentity :many
