@@ -69,7 +69,7 @@ func AddProject(store db.Queries, ctx context.Context, i int) error {
 		DoneStatus:  sql.NullBool{Bool: false, Valid: true},
 		UserID:      int64(rID),
 		Fee:         fmt.Sprintf("%.3f", rand.Float64()*float64(i)),
-		CategoryID:  sql.NullInt64{Int64: int64(rand.Intn(len(Categories) + 1)), Valid: true},
+		CategoryID:  int64(rand.Intn(len(Categories) + 1)),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}

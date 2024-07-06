@@ -22,7 +22,6 @@ func NewResolver(dbInstance db.Querier) *Resolver {
 
 func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	fmt.Println("heree", input)
 	insertParams := db.InsertUserIdentityParams{
 		Email:         input["email"].(string),
 		Password:      input["password"].(string),
@@ -33,7 +32,6 @@ func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{},
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
-	fmt.Println("herree", insertParams)
 	id, err := r.DbInstance.InsertUserIdentity(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
@@ -168,7 +166,7 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 		DoneStatus:  sql.NullBool{Bool: input["done_status"].(bool), Valid: true},
 		UserID:      int64(input["user_id"].(int)),
 		Fee:         input["fee"].(string),
-		CategoryID:  sql.NullInt64{Int64: int64(input["category_id"].(int)), Valid: true},
+		CategoryID:  int64((input["category_id"].(int))),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -178,7 +176,7 @@ func (r *Resolver) ResolveInsertProject(params graphql.ResolveParams) (interface
 		return nil, err
 	}
 
-	return r.DbInstance.GetProjectByID(context.Background(), id)
+	return r.DbInstance.GetProjectByID(context.Background(), int64(id))
 }
 
 func (r *Resolver) ResolveGetProjectByID(params graphql.ResolveParams) (interface{}, error) {
@@ -196,7 +194,7 @@ func (r *Resolver) ResolveUpdateProject(params graphql.ResolveParams) (interface
 		DoneStatus:  sql.NullBool{Bool: input["done_status"].(bool), Valid: true},
 		UserID:      int64(input["user_id"].(int)),
 		Fee:         input["fee"].(string),
-		CategoryID:  sql.NullInt64{Int64: input["category_id"].(int64), Valid: true},
+		CategoryID:  int64(input["category_id"].(int)),
 		UpdatedAt:   time.Now(),
 	}
 
@@ -231,30 +229,12 @@ func (r *Resolver) ResolveInsertComment(params graphql.ResolveParams) (interface
 		return nil, err
 	}
 
-	return r.DbInstance.GetCommentByID(context.Background(), id)
+	return id, nil
 }
 
 func (r *Resolver) ResolveGetCommentByID(params graphql.ResolveParams) (interface{}, error) {
-	id := params.Args["id"].(int)
-	return r.DbInstance.GetCommentByID(context.Background(), int64(id))
-}
-
-func (r *Resolver) ResolveUpdateComment(params graphql.ResolveParams) (interface{}, error) {
-	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateCommentByIDParams{
-		ID:        int64(input["id"].(int)),
-		UserID:    int64(input["user_id"].(int)),
-		ProjectID: int64(input["project_id"].(int)),
-		Date:      time.Now(),
-		Text:      input["text"].(string),
-	}
-
-	_, err := r.DbInstance.UpdateCommentByID(context.Background(), updateParams)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.DbInstance.GetCommentByID(context.Background(), updateParams.ID)
+	id := params.Args["project_id"].(int)
+	return r.DbInstance.GetProjectCommentByID(context.Background(), int64(id))
 }
 
 func (r *Resolver) ResolveDeleteComment(params graphql.ResolveParams) (interface{}, error) {
@@ -304,7 +284,7 @@ func (r *Resolver) ResolveGetAssignedUsersByProjectID(params graphql.ResolvePara
 
 func (r *Resolver) ResolveGetAssignedProjectsByUserID(params graphql.ResolveParams) (interface{}, error) {
 	userID := params.Args["user_id"].(int)
-	return r.DbInstance.GetAssignedprojectByUserID(context.Background(), int64(userID))
+	return r.DbInstance.GetAssignedProjectByUserID(context.Background(), int64(userID))
 }
 
 func (r *Resolver) ResolveInsertCategory(params graphql.ResolveParams) (interface{}, error) {
@@ -315,8 +295,7 @@ func (r *Resolver) ResolveInsertCategory(params graphql.ResolveParams) (interfac
 	if err != nil {
 		return nil, err
 	}
-
-	return id, nil
+	return r.DbInstance.GetCategory(context.Background(), id)
 }
 
 func (r *Resolver) ResolveDeleteCategory(params graphql.ResolveParams) (interface{}, error) {

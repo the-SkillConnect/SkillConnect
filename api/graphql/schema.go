@@ -42,9 +42,9 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 				},
 				// Comment queries
 				"comment": &graphql.Field{
-					Type: CommentType,
+					Type: graphql.NewList(CommentType),
 					Args: graphql.FieldConfigArgument{
-						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+						"project_id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
 					Resolve: resolver.ResolveGetCommentByID,
 				},
@@ -168,13 +168,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertCommentInputType)},
 					},
 					Resolve: resolver.ResolveInsertComment,
-				},
-				"updateComment": &graphql.Field{
-					Type: CommentType,
-					Args: graphql.FieldConfigArgument{
-						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateCommentInputType)},
-					},
-					Resolve: resolver.ResolveUpdateComment,
 				},
 				"deleteComment": &graphql.Field{
 					Type: graphql.Boolean,

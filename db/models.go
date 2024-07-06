@@ -30,16 +30,16 @@ type Comment struct {
 }
 
 type Project struct {
-	ID          int64         `json:"id"`
-	Description string        `json:"description"`
-	Title       string        `json:"title"`
-	TotalAmount string        `json:"total_amount"`
-	DoneStatus  sql.NullBool  `json:"done_status"`
-	UserID      int64         `json:"user_id"`
-	Fee         string        `json:"fee"`
-	CategoryID  sql.NullInt64 `json:"category_id"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
+	ID          int64        `json:"id"`
+	Description string       `json:"description"`
+	Title       string       `json:"title"`
+	TotalAmount string       `json:"total_amount"`
+	DoneStatus  sql.NullBool `json:"done_status"`
+	UserID      int64        `json:"user_id"`
+	Fee         string       `json:"fee"`
+	CategoryID  int64        `json:"category_id"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 type UserIdentity struct {

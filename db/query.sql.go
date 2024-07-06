@@ -84,12 +84,12 @@ func (q *Queries) DeleteUserRecommendation(ctx context.Context, arg DeleteUserRe
 	return err
 }
 
-const getAssignedUsersByProjectID = `-- name: GetAssignedUsersByProjectID :many
-SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE project_id = $1
+const getAssignedProjectByUserID = `-- name: GetAssignedProjectByUserID :many
+SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE user_id = $1
 `
 
-func (q *Queries) GetAssignedUsersByProjectID(ctx context.Context, projectID int64) ([]AssignProject, error) {
-	rows, err := q.db.QueryContext(ctx, getAssignedUsersByProjectID, projectID)
+func (q *Queries) GetAssignedProjectByUserID(ctx context.Context, userID int64) ([]AssignProject, error) {
+	rows, err := q.db.QueryContext(ctx, getAssignedProjectByUserID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +116,12 @@ func (q *Queries) GetAssignedUsersByProjectID(ctx context.Context, projectID int
 	return items, nil
 }
 
-const getAssignedprojectByUserID = `-- name: GetAssignedprojectByUserID :many
-SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE user_id = $1
+const getAssignedUsersByProjectID = `-- name: GetAssignedUsersByProjectID :many
+SELECT user_id, project_id, created_at, updated_at FROM assign_project WHERE project_id = $1
 `
 
-func (q *Queries) GetAssignedprojectByUserID(ctx context.Context, userID int64) ([]AssignProject, error) {
-	rows, err := q.db.QueryContext(ctx, getAssignedprojectByUserID, userID)
+func (q *Queries) GetAssignedUsersByProjectID(ctx context.Context, projectID int64) ([]AssignProject, error) {
+	rows, err := q.db.QueryContext(ctx, getAssignedUsersByProjectID, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -186,21 +186,108 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 	return i, err
 }
 
-const getCommentByID = `-- name: GetCommentByID :one
-SELECT id, user_id, project_id, date, text FROM comment WHERE id = $1
+const getCommentWithUserAndProject = `-- name: GetCommentWithUserAndProject :many
+SELECT 
+    c.id AS comment_id,
+    c.date,
+    c.text,
+    ui.id AS user_id,
+    ui.email,
+    ui.first_name,
+    ui.surname,
+    p.id AS project_id,
+    p.title
+FROM 
+    comment c
+JOIN 
+    user_identity ui ON c.user_id = ui.id
+JOIN 
+    project p ON c.project_id = p.id
+WHERE 
+    p.id = $1
 `
 
-func (q *Queries) GetCommentByID(ctx context.Context, id int64) (Comment, error) {
-	row := q.db.QueryRowContext(ctx, getCommentByID, id)
-	var i Comment
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.ProjectID,
-		&i.Date,
-		&i.Text,
-	)
-	return i, err
+type GetCommentWithUserAndProjectRow struct {
+	CommentID int64     `json:"comment_id"`
+	Date      time.Time `json:"date"`
+	Text      string    `json:"text"`
+	UserID    int64     `json:"user_id"`
+	Email     string    `json:"email"`
+	FirstName string    `json:"first_name"`
+	Surname   string    `json:"surname"`
+	ProjectID int64     `json:"project_id"`
+	Title     string    `json:"title"`
+}
+
+func (q *Queries) GetCommentWithUserAndProject(ctx context.Context, id int64) ([]GetCommentWithUserAndProjectRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCommentWithUserAndProject, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCommentWithUserAndProjectRow
+	for rows.Next() {
+		var i GetCommentWithUserAndProjectRow
+		if err := rows.Scan(
+			&i.CommentID,
+			&i.Date,
+			&i.Text,
+			&i.UserID,
+			&i.Email,
+			&i.FirstName,
+			&i.Surname,
+			&i.ProjectID,
+			&i.Title,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProject = `-- name: GetProject :many
+SELECT id, description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at FROM project
+`
+
+func (q *Queries) GetProject(ctx context.Context) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getProject)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(
+			&i.ID,
+			&i.Description,
+			&i.Title,
+			&i.TotalAmount,
+			&i.DoneStatus,
+			&i.UserID,
+			&i.Fee,
+			&i.CategoryID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getProjectAssignments = `-- name: GetProjectAssignments :many
@@ -297,58 +384,37 @@ func (q *Queries) GetProjectByID(ctx context.Context, id int64) (Project, error)
 	return i, err
 }
 
-const getProjectDetails = `-- name: GetProjectDetails :one
-SELECT 
-    p.id AS project_id,
-    p.description,
-    p.title,
-    p.total_amount,
-    p.done_status,
-    p.user_id,
-    p.fee,
-    p.category_id,
-    p.created_at,
-    p.updated_at,
-    c.title AS category_title
-FROM 
-    project p
-LEFT JOIN 
-    category c ON p.category_id = c.id
-WHERE 
-    p.id = $1
+const getProjectCommentByID = `-- name: GetProjectCommentByID :many
+SELECT id, user_id, project_id, date, text FROM comment WHERE project_id = $1
 `
 
-type GetProjectDetailsRow struct {
-	ProjectID     int64          `json:"project_id"`
-	Description   string         `json:"description"`
-	Title         string         `json:"title"`
-	TotalAmount   string         `json:"total_amount"`
-	DoneStatus    sql.NullBool   `json:"done_status"`
-	UserID        int64          `json:"user_id"`
-	Fee           string         `json:"fee"`
-	CategoryID    sql.NullInt64  `json:"category_id"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
-	CategoryTitle sql.NullString `json:"category_title"`
-}
-
-func (q *Queries) GetProjectDetails(ctx context.Context, id int64) (GetProjectDetailsRow, error) {
-	row := q.db.QueryRowContext(ctx, getProjectDetails, id)
-	var i GetProjectDetailsRow
-	err := row.Scan(
-		&i.ProjectID,
-		&i.Description,
-		&i.Title,
-		&i.TotalAmount,
-		&i.DoneStatus,
-		&i.UserID,
-		&i.Fee,
-		&i.CategoryID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.CategoryTitle,
-	)
-	return i, err
+func (q *Queries) GetProjectCommentByID(ctx context.Context, projectID int64) ([]Comment, error) {
+	rows, err := q.db.QueryContext(ctx, getProjectCommentByID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Comment
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ProjectID,
+			&i.Date,
+			&i.Text,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getUserIdentityByID = `-- name: GetUserIdentityByID :one
@@ -401,37 +467,29 @@ SELECT
     up.rating,
     up.description AS profile_description,
     up.done_project,
-    up.given_project,
-    ur.given_id,
-    ur.received_id,
-    ur.description AS recommendation_description
+    up.given_project
 FROM 
     user_identity ui
 JOIN 
     user_profile up ON ui.id = up.user_id
-LEFT JOIN 
-    user_recommendation ur ON up.recommendation_id = ur.given_id
 WHERE 
-    ui.id = $1
+    ui.id = 2
 `
 
 type GetUserProfileWithDetailsRow struct {
-	UserID                    int64          `json:"user_id"`
-	Email                     string         `json:"email"`
-	FirstName                 string         `json:"first_name"`
-	Surname                   string         `json:"surname"`
-	MobilePhone               string         `json:"mobile_phone"`
-	Rating                    int64          `json:"rating"`
-	ProfileDescription        sql.NullString `json:"profile_description"`
-	DoneProject               int64          `json:"done_project"`
-	GivenProject              int64          `json:"given_project"`
-	GivenID                   sql.NullInt64  `json:"given_id"`
-	ReceivedID                sql.NullInt64  `json:"received_id"`
-	RecommendationDescription sql.NullString `json:"recommendation_description"`
+	UserID             int64          `json:"user_id"`
+	Email              string         `json:"email"`
+	FirstName          string         `json:"first_name"`
+	Surname            string         `json:"surname"`
+	MobilePhone        string         `json:"mobile_phone"`
+	Rating             int64          `json:"rating"`
+	ProfileDescription sql.NullString `json:"profile_description"`
+	DoneProject        int64          `json:"done_project"`
+	GivenProject       int64          `json:"given_project"`
 }
 
-func (q *Queries) GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileWithDetails, id)
+func (q *Queries) GetUserProfileWithDetails(ctx context.Context) (GetUserProfileWithDetailsRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileWithDetails)
 	var i GetUserProfileWithDetailsRow
 	err := row.Scan(
 		&i.UserID,
@@ -443,9 +501,6 @@ func (q *Queries) GetUserProfileWithDetails(ctx context.Context, id int64) (GetU
 		&i.ProfileDescription,
 		&i.DoneProject,
 		&i.GivenProject,
-		&i.GivenID,
-		&i.ReceivedID,
-		&i.RecommendationDescription,
 	)
 	return i, err
 }
@@ -505,141 +560,6 @@ func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) 
 			&i.Surname,
 			&i.MobilePhone,
 			&i.WalletAddress,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getcomment = `-- name: Getcomment :many
-SELECT id, user_id, project_id, date, text FROM comment
-`
-
-func (q *Queries) Getcomment(ctx context.Context) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, getcomment)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Comment
-	for rows.Next() {
-		var i Comment
-		if err := rows.Scan(
-			&i.ID,
-			&i.UserID,
-			&i.ProjectID,
-			&i.Date,
-			&i.Text,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getcommentWithUserAndProject = `-- name: GetcommentWithUserAndProject :many
-SELECT 
-    c.id AS comment_id,
-    c.date,
-    c.text,
-    ui.id AS user_id,
-    ui.email,
-    ui.first_name,
-    ui.surname,
-    p.id AS project_id,
-    p.title
-FROM 
-    comment c
-JOIN 
-    user_identity ui ON c.user_id = ui.id
-JOIN 
-    project p ON c.project_id = p.id
-`
-
-type GetcommentWithUserAndProjectRow struct {
-	CommentID int64     `json:"comment_id"`
-	Date      time.Time `json:"date"`
-	Text      string    `json:"text"`
-	UserID    int64     `json:"user_id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	Surname   string    `json:"surname"`
-	ProjectID int64     `json:"project_id"`
-	Title     string    `json:"title"`
-}
-
-func (q *Queries) GetcommentWithUserAndProject(ctx context.Context) ([]GetcommentWithUserAndProjectRow, error) {
-	rows, err := q.db.QueryContext(ctx, getcommentWithUserAndProject)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetcommentWithUserAndProjectRow
-	for rows.Next() {
-		var i GetcommentWithUserAndProjectRow
-		if err := rows.Scan(
-			&i.CommentID,
-			&i.Date,
-			&i.Text,
-			&i.UserID,
-			&i.Email,
-			&i.FirstName,
-			&i.Surname,
-			&i.ProjectID,
-			&i.Title,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getproject = `-- name: Getproject :many
-SELECT id, description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at FROM project
-`
-
-func (q *Queries) Getproject(ctx context.Context) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, getproject)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Project
-	for rows.Next() {
-		var i Project
-		if err := rows.Scan(
-			&i.ID,
-			&i.Description,
-			&i.Title,
-			&i.TotalAmount,
-			&i.DoneStatus,
-			&i.UserID,
-			&i.Fee,
-			&i.CategoryID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -725,21 +645,21 @@ func (q *Queries) InsertComment(ctx context.Context, arg InsertCommentParams) (i
 }
 
 const insertProject = `-- name: InsertProject :one
-INSERT INTO project (description, title, total_amount, done_status, user_id, fee, category_id,created_at,updated_at)
+INSERT INTO project (description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING id
 `
 
 type InsertProjectParams struct {
-	Description string        `json:"description"`
-	Title       string        `json:"title"`
-	TotalAmount string        `json:"total_amount"`
-	DoneStatus  sql.NullBool  `json:"done_status"`
-	UserID      int64         `json:"user_id"`
-	Fee         string        `json:"fee"`
-	CategoryID  sql.NullInt64 `json:"category_id"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
+	Description string       `json:"description"`
+	Title       string       `json:"title"`
+	TotalAmount string       `json:"total_amount"`
+	DoneStatus  sql.NullBool `json:"done_status"`
+	UserID      int64        `json:"user_id"`
+	Fee         string       `json:"fee"`
+	CategoryID  int64        `json:"category_id"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (int64, error) {
@@ -855,34 +775,6 @@ func (q *Queries) InsertUserRecommendation(ctx context.Context, arg InsertUserRe
 	return i, err
 }
 
-const updateCommentByID = `-- name: UpdateCommentByID :one
-UPDATE comment
-SET user_id = $1, project_id = $2, date = $3, text = $4
-WHERE id = $5
-RETURNING id
-`
-
-type UpdateCommentByIDParams struct {
-	UserID    int64     `json:"user_id"`
-	ProjectID int64     `json:"project_id"`
-	Date      time.Time `json:"date"`
-	Text      string    `json:"text"`
-	ID        int64     `json:"id"`
-}
-
-func (q *Queries) UpdateCommentByID(ctx context.Context, arg UpdateCommentByIDParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, updateCommentByID,
-		arg.UserID,
-		arg.ProjectID,
-		arg.Date,
-		arg.Text,
-		arg.ID,
-	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
-}
-
 const updateProjectByID = `-- name: UpdateProjectByID :one
 UPDATE project
 SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, category_id = $7, updated_at = $8
@@ -891,15 +783,15 @@ RETURNING id
 `
 
 type UpdateProjectByIDParams struct {
-	Description string        `json:"description"`
-	Title       string        `json:"title"`
-	TotalAmount string        `json:"total_amount"`
-	DoneStatus  sql.NullBool  `json:"done_status"`
-	UserID      int64         `json:"user_id"`
-	Fee         string        `json:"fee"`
-	CategoryID  sql.NullInt64 `json:"category_id"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	ID          int64         `json:"id"`
+	Description string       `json:"description"`
+	Title       string       `json:"title"`
+	TotalAmount string       `json:"total_amount"`
+	DoneStatus  sql.NullBool `json:"done_status"`
+	UserID      int64        `json:"user_id"`
+	Fee         string       `json:"fee"`
+	CategoryID  int64        `json:"category_id"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+	ID          int64        `json:"id"`
 }
 
 func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDParams) (int64, error) {

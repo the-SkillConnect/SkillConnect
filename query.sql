@@ -30,7 +30,7 @@ RETURNING id;
 -- name: GetProjectByID :one
 SELECT * FROM project WHERE id = $1;
 
--- name: Getproject :many
+-- name: GetProject :many
 SELECT * FROM project;
 
 -- name: InsertProject :one
@@ -41,17 +41,8 @@ RETURNING id;
 -- name: DeleteCommentByID :exec
 DELETE FROM comment WHERE id = $1;
 
--- name: UpdateCommentByID :one
-UPDATE comment
-SET user_id = $1, project_id = $2, date = $3, text = $4
-WHERE id = $5
-RETURNING id;
-
--- name: GetCommentByID :one
-SELECT * FROM comment WHERE id = $1;
-
--- name: Getcomment :many
-SELECT * FROM comment;
+-- name: GetProjectCommentByID :many
+SELECT * FROM comment WHERE project_id = $1;
 
 -- name: InsertComment :one
 INSERT INTO comment (user_id, project_id, date, text)
@@ -66,7 +57,7 @@ INSERT INTO assign_project (user_id, project_id, created_at, updated_at)
 VALUES ($1, $2, $3, $4)
 RETURNING user_id, project_id;
 
--- name: GetAssignedprojectByUserID :many
+-- name: GetAssignedProjectByUserID :many
 SELECT * FROM assign_project WHERE user_id = $1;
 
 -- name: GetAssignedUsersByProjectID :many
@@ -127,38 +118,14 @@ SELECT
     up.rating,
     up.description AS profile_description,
     up.done_project,
-    up.given_project,
-    ur.given_id,
-    ur.received_id,
-    ur.description AS recommendation_description
+    up.given_project
 FROM 
     user_identity ui
 JOIN 
     user_profile up ON ui.id = up.user_id
-LEFT JOIN 
-    user_recommendation ur ON up.recommendation_id = ur.given_id
 WHERE 
-    ui.id = $1;
+    ui.id = 2;
 
--- name: GetProjectDetails :one
-SELECT 
-    p.id AS project_id,
-    p.description,
-    p.title,
-    p.total_amount,
-    p.done_status,
-    p.user_id,
-    p.fee,
-    p.category_id,
-    p.created_at,
-    p.updated_at,
-    c.title AS category_title
-FROM 
-    project p
-LEFT JOIN 
-    category c ON p.category_id = c.id
-WHERE 
-    p.id = $1;
 
 -- name: GetProjectAssignments :many
 SELECT 
@@ -182,7 +149,7 @@ JOIN
 JOIN 
     user_identity ui2 ON p.user_id = ui2.id;
 
--- name: GetcommentWithUserAndProject :many
+-- name: GetCommentWithUserAndProject :many
 SELECT 
     c.id AS comment_id,
     c.date,
@@ -198,4 +165,6 @@ FROM
 JOIN 
     user_identity ui ON c.user_id = ui.id
 JOIN 
-    project p ON c.project_id = p.id;
+    project p ON c.project_id = p.id
+WHERE 
+    p.id = $1;
