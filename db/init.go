@@ -147,7 +147,7 @@ func CreateProjectTable(db *sql.DB) error {
 		done_status BOOLEAN DEFAULT FALSE,
 		user_id BIGINT NOT NULL,
 		fee NUMERIC(10,2) NOT NULL,
-		category_id BIGINT,
+		category_id BIGINT NOT NULL,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
@@ -167,7 +167,7 @@ func CreateCommentTable(db *sql.DB) error {
 		project_id BIGINT NOT NULL,
 		date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		text TEXT NOT NULL
-	);
+	);	
 	`
 	_, err := db.Exec(createComment)
 	if err != nil {
