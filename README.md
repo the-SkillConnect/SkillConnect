@@ -20,9 +20,11 @@ cd SkillConnect
 sudo docker compose up -d
 ```
 
-- > [!NOTE] You can populate the database with sample data using `go run scripts/seed.go`
+- > [!NOTE]
+  > You can populate the database with sample data using `go run scripts/seed.go`
 
-- > [!NOTE] If you encounter issues downloading dependency packages, set the Go proxy using: `go env -w GOPROXY=https://goproxy.io,direct`
+- > [!NOTE]
+  > If you encounter issues downloading dependency packages, set the Go proxy using: `go env -w GOPROXY=https://goproxy.io,direct`
 
 2. Run the SkillConnect program:
 
