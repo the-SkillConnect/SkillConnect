@@ -10,10 +10,10 @@ import (
 )
 
 type AssignProject struct {
-	UserID    int64        `json:"user_id"`
-	ProjectID int64        `json:"project_id"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	UserID    int64     `json:"user_id"`
+	ProjectID int64     `json:"project_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Category struct {
@@ -30,16 +30,16 @@ type Comment struct {
 }
 
 type Project struct {
-	ID          int64         `json:"id"`
-	Description string        `json:"description"`
-	Title       string        `json:"title"`
-	TotalAmount string        `json:"total_amount"`
-	DoneStatus  sql.NullBool  `json:"done_status"`
-	UserID      int64         `json:"user_id"`
-	Fee         string        `json:"fee"`
-	Categories  sql.NullInt64 `json:"categories"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
+	ID          int64        `json:"id"`
+	Description string       `json:"description"`
+	Title       string       `json:"title"`
+	TotalAmount string       `json:"total_amount"`
+	DoneStatus  sql.NullBool `json:"done_status"`
+	UserID      int64        `json:"user_id"`
+	Fee         string       `json:"fee"`
+	CategoryID  int64        `json:"category_id"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 type UserIdentity struct {
@@ -55,18 +55,19 @@ type UserIdentity struct {
 }
 
 type UserProfile struct {
-	UserID           int64          `json:"user_id"`
-	Rating           int64          `json:"rating"`
-	Description      sql.NullString `json:"description"`
-	DoneProject      int64          `json:"done_project"`
-	GivenProject     int64          `json:"given_project"`
-	RecommendationID sql.NullInt64  `json:"recommendation_id"`
-	CreatedAt        time.Time      `json:"created_at"`
-	UpdatedAt        time.Time      `json:"updated_at"`
+	UserID       int64          `json:"user_id"`
+	Rating       int64          `json:"rating"`
+	Description  sql.NullString `json:"description"`
+	DoneProject  int64          `json:"done_project"`
+	GivenProject int64          `json:"given_project"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
 }
 
 type UserRecommendation struct {
-	GivenID     int64  `json:"given_id"`
-	ReceivedID  int64  `json:"received_id"`
-	Description string `json:"description"`
+	GivenID     int64     `json:"given_id"`
+	ReceivedID  int64     `json:"received_id"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

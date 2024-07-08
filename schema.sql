@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS project (
     done_status BOOLEAN DEFAULT FALSE,
     user_id BIGINT NOT NULL,
     fee NUMERIC(10,2) NOT NULL,
-    categories BIGINT,
+    category_id BIGINT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS assign_project (
     user_id BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, project_id)
 );
 
@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS user_profile (
     description TEXT,
     done_project BIGINT NOT NULL DEFAULT 0,
     given_project BIGINT NOT NULL DEFAULT 0,
-    recommendation_id BIGINT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -54,6 +53,8 @@ CREATE TABLE IF NOT EXISTS user_recommendation (
     given_id BIGINT NOT NULL,
     received_id BIGINT NOT NULL,
     description TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (given_id, received_id)
 );
 

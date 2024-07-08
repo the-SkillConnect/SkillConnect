@@ -1,0 +1,1 @@
+SELECT * FROM user_recommendation WHERE given_id = 1;

@@ -22,7 +22,7 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 				},
 				"usersIdentity": &graphql.Field{
 					Type:    graphql.NewList(UserIdentityType),
-					Resolve: resolver.ResolveGetUsers,
+					Resolve: resolver.ResolveGetUsersIdentity,
 				},
 				// New profile queries
 				"userProfile": &graphql.Field{
@@ -42,9 +42,9 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 				},
 				// Comment queries
 				"comment": &graphql.Field{
-					Type: CommentType,
+					Type: graphql.NewList(CommentType),
 					Args: graphql.FieldConfigArgument{
-						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+						"project_id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
 					Resolve: resolver.ResolveGetCommentByID,
 				},
@@ -62,20 +62,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"user_id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
 					Resolve: resolver.ResolveGetAssignedProjectsByUserID,
-				}, // AssignProject mutations
-				"insertAssignProject": &graphql.Field{
-					Type: AssignProjectType,
-					Args: graphql.FieldConfigArgument{
-						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertAssignProjectInputType)},
-					},
-					Resolve: resolver.ResolveInsertAssignProject,
-				},
-				"deleteAssignProject": &graphql.Field{
-					Type: graphql.Boolean,
-					Args: graphql.FieldConfigArgument{
-						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(DeleteAssignProjectInputType)},
-					},
-					Resolve: resolver.ResolveDeleteAssignProject,
 				},
 				// Category queries
 				"category": &graphql.Field{
@@ -88,6 +74,22 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 				"categories": &graphql.Field{
 					Type:    graphql.NewList(CategoryType),
 					Resolve: resolver.ResolveGetCategories,
+				},
+
+				//User_recommendation queries
+				"UserRecommendationByGivenID": &graphql.Field{
+					Type: graphql.NewList(UserRecommendationType),
+					Args: graphql.FieldConfigArgument{
+						"given_id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+					},
+					Resolve: resolver.ResolveGetUserRecommendationByGivenID,
+				},
+				"UserRecommendationByReceivedID": &graphql.Field{
+					Type: graphql.NewList(UserRecommendationType),
+					Args: graphql.FieldConfigArgument{
+						"received_id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+					},
+					Resolve: resolver.ResolveGetUserRecommendationByReceivedID,
 				},
 			},
 		}),
@@ -160,7 +162,21 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveDeleteProject,
 				},
-
+				// AssignProject mutations
+				"insertAssignProject": &graphql.Field{
+					Type: AssignProjectType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertAssignProjectInputType)},
+					},
+					Resolve: resolver.ResolveInsertAssignProject,
+				},
+				"deleteAssignProject": &graphql.Field{
+					Type: graphql.Boolean,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(DeleteAssignProjectInputType)},
+					},
+					Resolve: resolver.ResolveDeleteAssignProject,
+				},
 				// Comment mutations
 				"insertComment": &graphql.Field{
 					Type: CommentType,
@@ -168,13 +184,6 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertCommentInputType)},
 					},
 					Resolve: resolver.ResolveInsertComment,
-				},
-				"updateComment": &graphql.Field{
-					Type: CommentType,
-					Args: graphql.FieldConfigArgument{
-						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(UpdateCommentInputType)},
-					},
-					Resolve: resolver.ResolveUpdateComment,
 				},
 				"deleteComment": &graphql.Field{
 					Type: graphql.Boolean,
@@ -196,6 +205,21 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
 					Resolve: resolver.ResolveDeleteCategory,
+				},
+				// User_recommendation mutations
+				"insertUserRecommendation": &graphql.Field{
+					Type: UserRecommendationType,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(InsertUserRecommendationInputType)},
+					},
+					Resolve: resolver.ResolveInsertUserRecommendation,
+				},
+				"deleteUserRecommendation": &graphql.Field{
+					Type: graphql.Boolean,
+					Args: graphql.FieldConfigArgument{
+						"input": &graphql.ArgumentConfig{Type: graphql.NewNonNull(DeleteUserRecommendationInputType)},
+					},
+					Resolve: resolver.ResolveDeleteUserRecommendation,
 				},
 			},
 		}),

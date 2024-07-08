@@ -23,35 +23,26 @@ DELETE FROM project WHERE id = $1;
 
 -- name: UpdateProjectByID :one
 UPDATE project
-SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, categories = $7
-WHERE id = $8
+SET description = $1, title = $2, total_amount = $3, done_status = $4, user_id = $5, fee = $6, category_id = $7, updated_at = $8
+WHERE id = $9
 RETURNING id;
 
 -- name: GetProjectByID :one
 SELECT * FROM project WHERE id = $1;
 
--- name: Getproject :many
+-- name: GetProject :many
 SELECT * FROM project;
 
 -- name: InsertProject :one
-INSERT INTO project (description, title, total_amount, done_status, user_id, fee, categories)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO project (description, title, total_amount, done_status, user_id, fee, category_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING id;
 
 -- name: DeleteCommentByID :exec
 DELETE FROM comment WHERE id = $1;
 
--- name: UpdateCommentByID :one
-UPDATE comment
-SET user_id = $1, project_id = $2, date = $3, text = $4
-WHERE id = $5
-RETURNING id;
-
--- name: GetCommentByID :one
-SELECT * FROM comment WHERE id = $1;
-
--- name: Getcomment :many
-SELECT * FROM comment;
+-- name: GetProjectCommentByID :many
+SELECT * FROM comment WHERE project_id = $1;
 
 -- name: InsertComment :one
 INSERT INTO comment (user_id, project_id, date, text)
@@ -62,11 +53,11 @@ RETURNING id;
 DELETE FROM assign_project WHERE user_id = $1 AND project_id = $2;
 
 -- name: InsertAssignProject :one
-INSERT INTO assign_project (user_id, project_id)
-VALUES ($1, $2)
+INSERT INTO assign_project (user_id, project_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4)
 RETURNING user_id, project_id;
 
--- name: GetAssignedprojectByUserID :many
+-- name: GetAssignedProjectByUserID :many
 SELECT * FROM assign_project WHERE user_id = $1;
 
 -- name: GetAssignedUsersByProjectID :many
@@ -74,16 +65,16 @@ SELECT * FROM assign_project WHERE project_id = $1;
 
 -- name: UpdateUserProfile :one
 UPDATE user_profile
-SET rating = $1, description = $2, done_project = $3, given_project = $4, recommendation_id = $5, updated_at = $6
-WHERE user_id = $7
+SET rating = $1, description = $2, done_project = $3, given_project = $4, updated_at = $5
+WHERE user_id = $6
 RETURNING user_id;
 
 -- name: GetUserProfileByUserID :one
 SELECT * FROM user_profile WHERE user_id = $1;
 
 -- name: InsertUserProfile :one
-INSERT INTO user_profile (user_id, rating, description, done_project, given_project, recommendation_id,created_at,updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO user_profile (user_id, rating, description, done_project, given_project, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING user_id;
 
 -- name: DeleteUserProfileByID :exec
@@ -93,14 +84,14 @@ DELETE FROM user_profile WHERE user_id = $1;
 DELETE FROM user_recommendation WHERE given_id = $1 AND received_id = $2;
 
 -- name: InsertUserRecommendation :one
-INSERT INTO user_recommendation (given_id, received_id, description)
-VALUES ($1, $2, $3)
+INSERT INTO user_recommendation (given_id, received_id, description, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING given_id, received_id;
 
--- name: GetUserRecommendationByGivenID :one
+-- name: GetUserRecommendationByGivenID :many
 SELECT * FROM user_recommendation WHERE given_id = $1;
 
--- name: GetUserRecommendationByReceivedID :one
+-- name: GetUserRecommendationByReceivedID :many
 SELECT * FROM user_recommendation WHERE received_id = $1;
 
 -- name: InsertCategory :one
@@ -127,38 +118,14 @@ SELECT
     up.rating,
     up.description AS profile_description,
     up.done_project,
-    up.given_project,
-    ur.given_id,
-    ur.received_id,
-    ur.description AS recommendation_description
+    up.given_project
 FROM 
     user_identity ui
 JOIN 
     user_profile up ON ui.id = up.user_id
-LEFT JOIN 
-    user_recommendation ur ON up.recommendation_id = ur.given_id
 WHERE 
-    ui.id = $1;
+    ui.id = 2;
 
--- name: GetProjectDetails :one
-SELECT 
-    p.id AS project_id,
-    p.description,
-    p.title,
-    p.total_amount,
-    p.done_status,
-    p.user_id,
-    p.fee,
-    p.categories,
-    p.created_at,
-    p.updated_at,
-    c.title AS category_title
-FROM 
-    project p
-LEFT JOIN 
-    category c ON p.categories = c.id
-WHERE 
-    p.id = $1;
 
 -- name: GetProjectAssignments :many
 SELECT 
@@ -182,7 +149,7 @@ JOIN
 JOIN 
     user_identity ui2 ON p.user_id = ui2.id;
 
--- name: GetcommentWithUserAndProject :many
+-- name: GetCommentWithUserAndProject :many
 SELECT 
     c.id AS comment_id,
     c.date,
@@ -198,4 +165,6 @@ FROM
 JOIN 
     user_identity ui ON c.user_id = ui.id
 JOIN 
-    project p ON c.project_id = p.id;
+    project p ON c.project_id = p.id
+WHERE 
+    p.id = $1;
