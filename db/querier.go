@@ -27,7 +27,7 @@ type Querier interface {
 	GetProjectCommentByID(ctx context.Context, projectID int64) ([]Comment, error)
 	GetUserIdentityByID(ctx context.Context, id int64) (UserIdentity, error)
 	GetUserProfileByUserID(ctx context.Context, userID int64) (UserProfile, error)
-	GetUserProfileWithDetails(ctx context.Context) (GetUserProfileWithDetailsRow, error)
+	GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error)
 	GetUserRecommendationByGivenID(ctx context.Context, givenID int64) ([]UserRecommendation, error)
 	GetUserRecommendationByReceivedID(ctx context.Context, receivedID int64) ([]UserRecommendation, error)
 	GetUsersIdentity(ctx context.Context) ([]UserIdentity, error)

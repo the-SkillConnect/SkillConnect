@@ -329,3 +329,12 @@ func (r *Resolver) ResolveGetCategory(params graphql.ResolveParams) (interface{}
 	id := int32(params.Args["id"].(int))
 	return r.DbInstance.GetCategory(context.Background(), id)
 }
+
+func (r *Resolver) ResolveGetUserProfileWithDetails(params graphql.ResolveParams) (interface{}, error) {
+	id := int64(params.Args["id"].(int))
+	return r.DbInstance.GetUserProfileWithDetails(context.Background(), id)
+}
+
+func (r *Resolver) ResolveGetProjectAssignments(params graphql.ResolveParams) (interface{}, error) {
+	return r.DbInstance.GetProjectAssignments(context.Background())
+}
