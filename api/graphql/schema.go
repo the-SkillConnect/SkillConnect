@@ -91,6 +91,20 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 					},
 					Resolve: resolver.ResolveGetUserRecommendationByReceivedID,
 				},
+
+				// db Joins queries
+				"GetUserProfileWithDetails": &graphql.Field{
+					Type: GetUserProfileWithDetails,
+					Args: graphql.FieldConfigArgument{
+						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
+					},
+					Resolve: resolver.ResolveGetUserProfileWithDetails,
+				},
+
+				"GetProjectAssignments": &graphql.Field{
+					Type:    graphql.NewList(GetProjectAssignments),
+					Resolve: resolver.ResolveGetProjectAssignments,
+				},
 			},
 		}),
 		Mutation: graphql.NewObject(graphql.ObjectConfig{

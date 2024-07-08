@@ -107,7 +107,7 @@ SELECT * FROM category WHERE id = $1;
 
 -- name: GetCategories :many
 SELECT * FROM category;
-
+    
 -- name: GetUserProfileWithDetails :one
 SELECT 
     ui.id AS user_id,
@@ -124,7 +124,7 @@ FROM
 JOIN 
     user_profile up ON ui.id = up.user_id
 WHERE 
-    ui.id = 2;
+    ui.id = $1;
 
 
 -- name: GetProjectAssignments :many

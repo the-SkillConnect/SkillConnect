@@ -215,3 +215,35 @@ var InsertCategoryInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 		"title": &graphql.InputObjectFieldConfig{Type: graphql.NewNonNull(graphql.String)},
 	},
 })
+
+var GetUserProfileWithDetails = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GetUserProfileWithDetails",
+	Fields: graphql.Fields{
+		"userID":              &graphql.Field{Type: graphql.Int},
+		"email":               &graphql.Field{Type: graphql.String},
+		"first_name":          &graphql.Field{Type: graphql.String},
+		"surname":             &graphql.Field{Type: graphql.String},
+		"mobile_phone":        &graphql.Field{Type: graphql.String},
+		"rating":              &graphql.Field{Type: graphql.Int},
+		"profile_description": &graphql.Field{Type: graphql.String},
+		"doneProject":         &graphql.Field{Type: graphql.Int},
+		"givenProject":        &graphql.Field{Type: graphql.Int},
+	},
+})
+
+var GetProjectAssignments = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GetProjectAssignments",
+	Fields: graphql.Fields{
+		"project_id":               &graphql.Field{Type: graphql.Int},
+		"assigned_user_id":         &graphql.Field{Type: graphql.Int},
+		"created_at":               &graphql.Field{Type: graphql.DateTime},
+		"updated_at":               &graphql.Field{Type: graphql.DateTime},
+		"assigned_user_email":      &graphql.Field{Type: graphql.String},
+		"assigned_user_first_name": &graphql.Field{Type: graphql.String},
+		"assigned_user_surname":    &graphql.Field{Type: graphql.String},
+		"project_owner_id":         &graphql.Field{Type: graphql.Int},
+		"project_owner_email":      &graphql.Field{Type: graphql.String},
+		"project_owner_first_name": &graphql.Field{Type: graphql.String},
+		"project_owner_surname":    &graphql.Field{Type: graphql.String},
+	},
+})

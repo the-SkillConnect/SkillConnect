@@ -473,7 +473,7 @@ FROM
 JOIN 
     user_profile up ON ui.id = up.user_id
 WHERE 
-    ui.id = 2
+    ui.id = $1
 `
 
 type GetUserProfileWithDetailsRow struct {
@@ -488,8 +488,8 @@ type GetUserProfileWithDetailsRow struct {
 	GivenProject       int64          `json:"given_project"`
 }
 
-func (q *Queries) GetUserProfileWithDetails(ctx context.Context) (GetUserProfileWithDetailsRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserProfileWithDetails)
+func (q *Queries) GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfileWithDetails, id)
 	var i GetUserProfileWithDetailsRow
 	err := row.Scan(
 		&i.UserID,
