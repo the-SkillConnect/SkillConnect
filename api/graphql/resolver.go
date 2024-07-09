@@ -81,7 +81,7 @@ func (r *Resolver) ResolveInsertUserProfile(params graphql.ResolveParams) (inter
 	insertParams := db.InsertUserProfileParams{
 		UserID:       int64(input["user_id"].(int)),
 		Rating:       int64(input["rating"].(int)),
-		Description:  sql.NullString{String: input["description"].(string), Valid: true},
+		Description:  input["description"].(string),
 		DoneProject:  int64(input["done_project"].(int)),
 		GivenProject: int64(input["given_project"].(int)),
 		CreatedAt:    time.Now(),
@@ -106,7 +106,7 @@ func (r *Resolver) ResolveUpdateUserProfile(params graphql.ResolveParams) (inter
 	updateParams := db.UpdateUserProfileParams{
 		UserID:       int64(input["user_id"].(int)),
 		Rating:       input["rating"].(int64),
-		Description:  sql.NullString{String: input["description"].(string), Valid: true},
+		Description:  input["description"].(string),
 		DoneProject:  input["done_project"].(int64),
 		GivenProject: input["given_project"].(int64),
 		UpdatedAt:    time.Now(),

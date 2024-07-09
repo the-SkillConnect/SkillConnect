@@ -39,7 +39,7 @@ func AddUserProfile(store db.Queries, ctx context.Context, i int) error {
 	arg := db.InsertUserProfileParams{
 		UserID:       int64(i),
 		Rating:       int64(rand.Intn(5)),
-		Description:  sql.NullString{String: fmt.Sprintf("this is a mock description for user %d", i), Valid: true},
+		Description:  fmt.Sprintf("this is a mock description for user %d", i),
 		DoneProject:  int64(rand.Intn(20)),
 		GivenProject: int64(rand.Intn(100)),
 		CreatedAt:    time.Now(),

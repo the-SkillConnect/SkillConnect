@@ -477,15 +477,15 @@ WHERE
 `
 
 type GetUserProfileWithDetailsRow struct {
-	UserID             int64          `json:"user_id"`
-	Email              string         `json:"email"`
-	FirstName          string         `json:"first_name"`
-	Surname            string         `json:"surname"`
-	MobilePhone        string         `json:"mobile_phone"`
-	Rating             int64          `json:"rating"`
-	ProfileDescription sql.NullString `json:"profile_description"`
-	DoneProject        int64          `json:"done_project"`
-	GivenProject       int64          `json:"given_project"`
+	UserID             int64  `json:"user_id"`
+	Email              string `json:"email"`
+	FirstName          string `json:"first_name"`
+	Surname            string `json:"surname"`
+	MobilePhone        string `json:"mobile_phone"`
+	Rating             int64  `json:"rating"`
+	ProfileDescription string `json:"profile_description"`
+	DoneProject        int64  `json:"done_project"`
+	GivenProject       int64  `json:"given_project"`
 }
 
 func (q *Queries) GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error) {
@@ -751,13 +751,13 @@ RETURNING user_id
 `
 
 type InsertUserProfileParams struct {
-	UserID       int64          `json:"user_id"`
-	Rating       int64          `json:"rating"`
-	Description  sql.NullString `json:"description"`
-	DoneProject  int64          `json:"done_project"`
-	GivenProject int64          `json:"given_project"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
+	UserID       int64     `json:"user_id"`
+	Rating       int64     `json:"rating"`
+	Description  string    `json:"description"`
+	DoneProject  int64     `json:"done_project"`
+	GivenProject int64     `json:"given_project"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func (q *Queries) InsertUserProfile(ctx context.Context, arg InsertUserProfileParams) (int64, error) {
@@ -883,12 +883,12 @@ RETURNING user_id
 `
 
 type UpdateUserProfileParams struct {
-	Rating       int64          `json:"rating"`
-	Description  sql.NullString `json:"description"`
-	DoneProject  int64          `json:"done_project"`
-	GivenProject int64          `json:"given_project"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	UserID       int64          `json:"user_id"`
+	Rating       int64     `json:"rating"`
+	Description  string    `json:"description"`
+	DoneProject  int64     `json:"done_project"`
+	GivenProject int64     `json:"given_project"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	UserID       int64     `json:"user_id"`
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (int64, error) {

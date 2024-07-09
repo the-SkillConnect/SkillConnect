@@ -55,13 +55,13 @@ type UserIdentity struct {
 }
 
 type UserProfile struct {
-	UserID       int64          `json:"user_id"`
-	Rating       int64          `json:"rating"`
-	Description  sql.NullString `json:"description"`
-	DoneProject  int64          `json:"done_project"`
-	GivenProject int64          `json:"given_project"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
+	UserID       int64     `json:"user_id"`
+	Rating       int64     `json:"rating"`
+	Description  string    `json:"description"`
+	DoneProject  int64     `json:"done_project"`
+	GivenProject int64     `json:"given_project"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type UserRecommendation struct {

@@ -105,7 +105,7 @@ func CreateUserProfileTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS user_profile (
 		user_id BIGINT PRIMARY KEY,
 		rating BIGINT NOT NULL DEFAULT 0,
-		description TEXT,
+		description TEXT NOT NULL,
 		done_project BIGINT NOT NULL DEFAULT 0,
 		given_project BIGINT NOT NULL DEFAULT 0,
 		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
