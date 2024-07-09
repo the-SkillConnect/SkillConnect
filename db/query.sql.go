@@ -418,7 +418,7 @@ func (q *Queries) GetProjectCommentByID(ctx context.Context, projectID int64) ([
 }
 
 const getUserIdentityByID = `-- name: GetUserIdentityByID :one
-SELECT id, email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity WHERE id = $1
+SELECT id, email, encrypted_password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity WHERE id = $1
 `
 
 func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdentity, error) {
@@ -427,7 +427,7 @@ func (q *Queries) GetUserIdentityByID(ctx context.Context, id int64) (UserIdenti
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Password,
+		&i.EncryptedPassword,
 		&i.FirstName,
 		&i.Surname,
 		&i.MobilePhone,
@@ -572,32 +572,22 @@ func (q *Queries) GetUserRecommendationByReceivedID(ctx context.Context, receive
 }
 
 const getUsersIdentity = `-- name: GetUsersIdentity :many
-SELECT id, email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at FROM user_identity
+SELECT (email, first_name, surname, mobile_phone, wallet_address, created_at, updated_at) FROM user_identity
 `
 
-func (q *Queries) GetUsersIdentity(ctx context.Context) ([]UserIdentity, error) {
+func (q *Queries) GetUsersIdentity(ctx context.Context) ([]interface{}, error) {
 	rows, err := q.db.QueryContext(ctx, getUsersIdentity)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []UserIdentity
+	var items []interface{}
 	for rows.Next() {
-		var i UserIdentity
-		if err := rows.Scan(
-			&i.ID,
-			&i.Email,
-			&i.Password,
-			&i.FirstName,
-			&i.Surname,
-			&i.MobilePhone,
-			&i.WalletAddress,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
+		var column_1 interface{}
+		if err := rows.Scan(&column_1); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, column_1)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err
@@ -712,26 +702,26 @@ func (q *Queries) InsertProject(ctx context.Context, arg InsertProjectParams) (i
 }
 
 const insertUserIdentity = `-- name: InsertUserIdentity :one
-INSERT INTO user_identity (email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
+INSERT INTO user_identity (email, encrypted_password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id
 `
 
 type InsertUserIdentityParams struct {
-	Email         string    `json:"email"`
-	Password      string    `json:"password"`
-	FirstName     string    `json:"first_name"`
-	Surname       string    `json:"surname"`
-	MobilePhone   string    `json:"mobile_phone"`
-	WalletAddress string    `json:"wallet_address"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	Email             string    `json:"email"`
+	EncryptedPassword string    `json:"encrypted_password"`
+	FirstName         string    `json:"first_name"`
+	Surname           string    `json:"surname"`
+	MobilePhone       string    `json:"mobile_phone"`
+	WalletAddress     string    `json:"wallet_address"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 func (q *Queries) InsertUserIdentity(ctx context.Context, arg InsertUserIdentityParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, insertUserIdentity,
 		arg.Email,
-		arg.Password,
+		arg.EncryptedPassword,
 		arg.FirstName,
 		arg.Surname,
 		arg.MobilePhone,
@@ -845,25 +835,25 @@ func (q *Queries) UpdateProjectByID(ctx context.Context, arg UpdateProjectByIDPa
 
 const updateUserIdentityByID = `-- name: UpdateUserIdentityByID :one
 UPDATE user_identity
-SET email = $1, password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
+SET email = $1, encrypted_password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
 WHERE id = $7
 RETURNING id
 `
 
 type UpdateUserIdentityByIDParams struct {
-	Email       string    `json:"email"`
-	Password    string    `json:"password"`
-	FirstName   string    `json:"first_name"`
-	Surname     string    `json:"surname"`
-	MobilePhone string    `json:"mobile_phone"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	ID          int64     `json:"id"`
+	Email             string    `json:"email"`
+	EncryptedPassword string    `json:"encrypted_password"`
+	FirstName         string    `json:"first_name"`
+	Surname           string    `json:"surname"`
+	MobilePhone       string    `json:"mobile_phone"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	ID                int64     `json:"id"`
 }
 
 func (q *Queries) UpdateUserIdentityByID(ctx context.Context, arg UpdateUserIdentityByIDParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, updateUserIdentityByID,
 		arg.Email,
-		arg.Password,
+		arg.EncryptedPassword,
 		arg.FirstName,
 		arg.Surname,
 		arg.MobilePhone,

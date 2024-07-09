@@ -3,12 +3,14 @@ package graphql
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/graphql-go/graphql"
 	"github.com/the-SkillConnect/SkillConnect/db"
+	"golang.org/x/crypto/bcrypt"
 )
+
+const bcryptCost = 12
 
 type Resolver struct {
 	DbInstance db.Querier
@@ -22,21 +24,24 @@ func NewResolver(dbInstance db.Querier) *Resolver {
 
 func (r *Resolver) ResolveInsertUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(input["password"].(string)), bcryptCost)
+	if err != nil {
+		return nil, err
+	}
 	insertParams := db.InsertUserIdentityParams{
-		Email:         input["email"].(string),
-		Password:      input["password"].(string),
-		FirstName:     input["first_name"].(string),
-		Surname:       input["surname"].(string),
-		MobilePhone:   input["mobile_phone"].(string),
-		WalletAddress: input["wallet_address"].(string),
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		Email:             input["email"].(string),
+		EncryptedPassword: string(encryptedPassword),
+		FirstName:         input["first_name"].(string),
+		Surname:           input["surname"].(string),
+		MobilePhone:       input["mobile_phone"].(string),
+		WalletAddress:     input["wallet_address"].(string),
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
 	}
 	id, err := r.DbInstance.InsertUserIdentity(context.Background(), insertParams)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("here")
 	return r.DbInstance.GetUserIdentityByID(context.Background(), id)
 }
 
@@ -56,16 +61,20 @@ func (r *Resolver) ResolveDeleteUser(params graphql.ResolveParams) (interface{},
 
 func (r *Resolver) ResolveUpdateUser(params graphql.ResolveParams) (interface{}, error) {
 	input := params.Args["input"].(map[string]interface{})
-	updateParams := db.UpdateUserIdentityByIDParams{
-		ID:          int64(input["id"].(int)),
-		Email:       input["email"].(string),
-		Password:    input["password"].(string),
-		FirstName:   input["first_name"].(string),
-		Surname:     input["surname"].(string),
-		MobilePhone: input["mobile_phone"].(string),
-		UpdatedAt:   time.Now(),
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(input["password"].(string)), bcryptCost)
+	if err != nil {
+		return nil, err
 	}
-	_, err := r.DbInstance.UpdateUserIdentityByID(context.Background(), updateParams)
+	updateParams := db.UpdateUserIdentityByIDParams{
+		ID:                int64(input["id"].(int)),
+		Email:             input["email"].(string),
+		EncryptedPassword: string(encryptedPassword),
+		FirstName:         input["first_name"].(string),
+		Surname:           input["surname"].(string),
+		MobilePhone:       input["mobile_phone"].(string),
+		UpdatedAt:         time.Now(),
+	}
+	_, err = r.DbInstance.UpdateUserIdentityByID(context.Background(), updateParams)
 	if err != nil {
 		return nil, err
 	}

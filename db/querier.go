@@ -30,7 +30,7 @@ type Querier interface {
 	GetUserProfileWithDetails(ctx context.Context, id int64) (GetUserProfileWithDetailsRow, error)
 	GetUserRecommendationByGivenID(ctx context.Context, givenID int64) ([]UserRecommendation, error)
 	GetUserRecommendationByReceivedID(ctx context.Context, receivedID int64) ([]UserRecommendation, error)
-	GetUsersIdentity(ctx context.Context) ([]UserIdentity, error)
+	GetUsersIdentity(ctx context.Context) ([]interface{}, error)
 	InsertAssignProject(ctx context.Context, arg InsertAssignProjectParams) (InsertAssignProjectRow, error)
 	InsertCategory(ctx context.Context, title string) (int32, error)
 	InsertComment(ctx context.Context, arg InsertCommentParams) (int64, error)

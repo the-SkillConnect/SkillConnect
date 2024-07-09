@@ -3,7 +3,7 @@ DELETE FROM user_identity WHERE id = $1;
 
 -- name: UpdateUserIdentityByID :one
 UPDATE user_identity
-SET email = $1, password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
+SET email = $1, encrypted_password = $2, first_name = $3, surname = $4, mobile_phone = $5, updated_at = $6
 WHERE id = $7
 RETURNING id;
 
@@ -11,10 +11,10 @@ RETURNING id;
 SELECT * FROM user_identity WHERE id = $1;
 
 -- name: GetUsersIdentity :many
-SELECT * FROM user_identity;
+SELECT (email, first_name, surname, mobile_phone, wallet_address, created_at, updated_at) FROM user_identity;
 
 -- name: InsertUserIdentity :one
-INSERT INTO user_identity (email, password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
+INSERT INTO user_identity (email, encrypted_password, first_name, surname, mobile_phone, wallet_address, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id;
 

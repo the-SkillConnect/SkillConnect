@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS assign_project (
 CREATE TABLE IF NOT EXISTS user_identity (
     id BIGSERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
+    encrypted_password TEXT NOT NULL,
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
     mobile_phone TEXT NOT NULL UNIQUE,
