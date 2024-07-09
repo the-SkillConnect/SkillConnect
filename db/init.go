@@ -82,16 +82,16 @@ func TearDown(db *sql.DB) {
 func CreateUserIdentityTable(db *sql.DB) error {
 	createUserIdentityTable := `
 	CREATE TABLE IF NOT EXISTS user_identity (
-		id BIGSERIAL PRIMARY KEY,
-		email TEXT NOT NULL UNIQUE,
-		password TEXT NOT NULL,
-		first_name TEXT NOT NULL,
-		surname TEXT NOT NULL,
-		mobile_phone TEXT NOT NULL UNIQUE,
-		wallet_address TEXT NOT NULL UNIQUE,
-		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-	);
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    encrypted_password TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    surname TEXT NOT NULL,
+    mobile_phone TEXT NOT NULL UNIQUE,
+    wallet_address TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 	`
 	_, err := db.Exec(createUserIdentityTable)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/the-SkillConnect/SkillConnect/db"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -20,18 +21,25 @@ var (
 	}
 )
 
+const bcryptCost = 12
+
 func AddUserIdentity(store db.Queries, ctx context.Context, i int) error {
-	arg := db.InsertUserIdentityParams{
-		Email:         fmt.Sprintf("user%d@james.com", i),
-		Password:      fmt.Sprintf("abcd%d%d%d%d", i, i, i, i),
-		FirstName:     fmt.Sprintf("user%d", i),
-		Surname:       fmt.Sprintf("james%d", i),
-		MobilePhone:   fmt.Sprintf("%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
-		WalletAddress: fmt.Sprintf("secureWallet%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+	password := fmt.Sprintf("abcd%d%d%d%d", i, i, i, i)
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+	if err != nil {
+		return err
 	}
-	_, err := store.InsertUserIdentity(ctx, arg)
+	arg := db.InsertUserIdentityParams{
+		Email:             fmt.Sprintf("user%d@james.com", i),
+		EncryptedPassword: string(encryptedPassword),
+		FirstName:         fmt.Sprintf("user%d", i),
+		Surname:           fmt.Sprintf("james%d", i),
+		MobilePhone:       fmt.Sprintf("%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
+		WalletAddress:     fmt.Sprintf("secureWallet%d%d%d%d%d%d%d", i, i, i, i+6, i*2, i+3, i+2),
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
+	}
+	_, err = store.InsertUserIdentity(ctx, arg)
 	return err
 }
 

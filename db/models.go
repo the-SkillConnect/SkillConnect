@@ -43,15 +43,15 @@ type Project struct {
 }
 
 type UserIdentity struct {
-	ID            int64     `json:"id"`
-	Email         string    `json:"email"`
-	Password      string    `json:"password"`
-	FirstName     string    `json:"first_name"`
-	Surname       string    `json:"surname"`
-	MobilePhone   string    `json:"mobile_phone"`
-	WalletAddress string    `json:"wallet_address"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID                int64     `json:"id"`
+	Email             string    `json:"email"`
+	EncryptedPassword string    `json:"encrypted_password"`
+	FirstName         string    `json:"first_name"`
+	Surname           string    `json:"surname"`
+	MobilePhone       string    `json:"mobile_phone"`
+	WalletAddress     string    `json:"wallet_address"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 type UserProfile struct {

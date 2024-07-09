@@ -14,14 +14,14 @@ func NewSchema(dbInstance db.Querier) (graphql.Schema, error) {
 			Fields: graphql.Fields{
 				// Existing user queries
 				"userIdentity": &graphql.Field{
-					Type: UserIdentityType,
+					Type: GetUserIdentityType,
 					Args: graphql.FieldConfigArgument{
 						"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
 					},
 					Resolve: resolver.ResolveGetUserByID,
 				},
 				"usersIdentity": &graphql.Field{
-					Type:    graphql.NewList(UserIdentityType),
+					Type:    graphql.NewList(GetUserIdentityType),
 					Resolve: resolver.ResolveGetUsersIdentity,
 				},
 				// New profile queries

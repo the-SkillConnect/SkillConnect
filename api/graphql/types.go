@@ -24,6 +24,19 @@ var UserIdentityType = graphql.NewObject(graphql.ObjectConfig{
 		"updated_at":     &graphql.Field{Type: graphql.DateTime},
 	},
 })
+var GetUserIdentityType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GetUserIdentityType",
+	Fields: graphql.Fields{
+		"id":             &graphql.Field{Type: graphql.Int},
+		"email":          &graphql.Field{Type: graphql.String},
+		"first_name":     &graphql.Field{Type: graphql.String},
+		"surname":        &graphql.Field{Type: graphql.String},
+		"mobile_phone":   &graphql.Field{Type: graphql.String},
+		"wallet_address": &graphql.Field{Type: graphql.String},
+		"created_at":     &graphql.Field{Type: graphql.DateTime},
+		"updated_at":     &graphql.Field{Type: graphql.DateTime},
+	},
+})
 
 var InsertUserIdentityInputType = graphql.NewInputObject(graphql.InputObjectConfig{
 	Name: "InsertUserIdentityInput",
