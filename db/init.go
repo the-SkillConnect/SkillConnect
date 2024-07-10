@@ -3,7 +3,10 @@ package db
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -11,15 +14,41 @@ var (
 	ErrorCreateUserIdentityTable  = errors.New("could not create user identity table")
 	ErrorCreateUserProfileTable   = errors.New("could not create user profile table")
 	ErrorCreateUserRecommendation = errors.New("could not create user recommendation table")
-	ErrorCreateProjectTable       = errors.New("could not project table")
-	ErrorCreateComment            = errors.New("could not project comment table")
-	ErrorCreateCategory           = errors.New("could not category table")
-	ErrorCreateAssignedProject    = errors.New("could not project Assigned project table")
+	ErrorCreateProjectTable       = errors.New("could not create project table")
+	ErrorCreateComment            = errors.New("could not create comment table")
+	ErrorCreateCategory           = errors.New("could not create category table")
+	ErrorCreateAssignedProject    = errors.New("could not create assigned project table")
 )
 
-func InitDB() (*sql.DB, error) {
+type DBParameter struct {
+	Address  string
+	Username string
+	Password string
+}
 
-	db, err := sql.Open("postgres", "postgres://admin:admin@localhost:5432/database?sslmode=disable")
+func NewDBParameter(param DBParameter) *DBParameter {
+	return &DBParameter{
+		Address:  param.Address,
+		Username: param.Username,
+		Password: param.Password,
+	}
+}
+
+func InitDB() (*sql.DB, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return nil, fmt.Errorf("error loading .env file")
+	}
+
+	params := DBParameter{
+		Address:  os.Getenv("DB_LISTEN_ADDRESS"),
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+	}
+
+	connection := fmt.Sprintf("postgres://%s:%s@%s/database?sslmode=disable", params.Username, params.Password, params.Address)
+
+	db, err := sql.Open("postgres", connection)
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +62,7 @@ func InitDB() (*sql.DB, error) {
 
 	return db, err
 }
+
 func CreateTables(db *sql.DB) error {
 	err := CreateUserIdentityTable(db)
 	if err != nil {
@@ -66,14 +96,13 @@ func CreateTables(db *sql.DB) error {
 
 	err = CreateAssignedProjectTable(db)
 	return err
-
 }
 
 func TearDown(db *sql.DB) {
 	db.Exec("DROP TABLE IF EXISTS user_identity")
 	db.Exec("DROP TABLE IF EXISTS user_profile")
 	db.Exec("DROP TABLE IF EXISTS user_recommendation")
-	db.Exec("DROP TABLE IF EXISTS Project")
+	db.Exec("DROP TABLE IF EXISTS project")
 	db.Exec("DROP TABLE IF EXISTS comment")
 	db.Exec("DROP TABLE IF EXISTS assign_project")
 	db.Exec("DROP TABLE IF EXISTS category")
@@ -82,16 +111,16 @@ func TearDown(db *sql.DB) {
 func CreateUserIdentityTable(db *sql.DB) error {
 	createUserIdentityTable := `
 	CREATE TABLE IF NOT EXISTS user_identity (
-    id BIGSERIAL PRIMARY KEY,
-    email TEXT NOT NULL UNIQUE,
-    encrypted_password TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    surname TEXT NOT NULL,
-    mobile_phone TEXT NOT NULL UNIQUE,
-    wallet_address TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+		id BIGSERIAL PRIMARY KEY,
+		email TEXT NOT NULL UNIQUE,
+		encrypted_password TEXT NOT NULL,
+		first_name TEXT NOT NULL,
+		surname TEXT NOT NULL,
+		mobile_phone TEXT NOT NULL UNIQUE,
+		wallet_address TEXT NOT NULL UNIQUE,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 	_, err := db.Exec(createUserIdentityTable)
 	if err != nil {

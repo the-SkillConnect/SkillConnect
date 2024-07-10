@@ -5,11 +5,17 @@ import (
 	"log"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/the-SkillConnect/SkillConnect/db"
 	"github.com/the-SkillConnect/SkillConnect/db/fixtures"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	now := time.Now()
 	var i int
 	go func() {

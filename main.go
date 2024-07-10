@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/the-SkillConnect/SkillConnect/api/graphql"
@@ -10,6 +11,7 @@ import (
 )
 
 func main() {
+
 	dbInstance, err := db.InitDB()
 	if err != nil {
 		log.Fatal(err)
@@ -27,5 +29,5 @@ func main() {
 	app := fiber.New()
 	app.Post("/graphql", handlers.GraphQLHandler(schema))
 
-	log.Fatal(app.Listen(":8585"))
+	log.Fatal(app.Listen(os.Getenv("HTTP_LISTEN_ADDRESS")))
 }
