@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	Categories = [...]string{
+	Categories = []string{
 		"tech",
 		"database",
 		"S3",
@@ -29,6 +29,7 @@ func AddUserIdentity(store db.Queries, ctx context.Context, i int) error {
 	if err != nil {
 		return err
 	}
+
 	arg := db.InsertUserIdentityParams{
 		Email:             fmt.Sprintf("user%d@james.com", i),
 		EncryptedPassword: string(encryptedPassword),
@@ -39,6 +40,7 @@ func AddUserIdentity(store db.Queries, ctx context.Context, i int) error {
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}
+
 	_, err = store.InsertUserIdentity(ctx, arg)
 	return err
 }
@@ -53,6 +55,7 @@ func AddUserProfile(store db.Queries, ctx context.Context, i int) error {
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
+
 	_, err := store.InsertUserProfile(ctx, arg)
 	return err
 }
@@ -62,10 +65,11 @@ func AddUserRecommendation(store db.Queries, ctx context.Context, i int) error {
 	arg := db.InsertUserRecommendationParams{
 		GivenID:     int64(i),
 		ReceivedID:  int64(rID),
-		Description: fmt.Sprintf("this is recom from user%d to user%d", int64(i), int64(rID)),
+		Description: fmt.Sprintf("this is a recommendation from user%d to user%d", i, rID),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
+
 	_, err := store.InsertUserRecommendation(ctx, arg)
 	return err
 }
@@ -73,16 +77,17 @@ func AddUserRecommendation(store db.Queries, ctx context.Context, i int) error {
 func AddProject(store db.Queries, ctx context.Context, i int) error {
 	rID := rand.Intn(i) + 1
 	arg := db.InsertProjectParams{
-		Description: fmt.Sprintf("this is a mock mock mock mock mock project from user%d", int64(i)),
-		Title:       fmt.Sprintf("this is a mock project title from user%d", int64(i)),
+		Description: fmt.Sprintf("this is a mock project from user%d", i),
+		Title:       fmt.Sprintf("mock project title from user%d", i),
 		TotalAmount: fmt.Sprintf("%.3f", rand.Float64()*float64(i*10)),
 		DoneStatus:  sql.NullBool{Bool: false, Valid: true},
 		UserID:      int64(rID),
 		Fee:         fmt.Sprintf("%.3f", rand.Float64()*float64(i)),
-		CategoryID:  int64(rand.Intn(len(Categories) + 1)),
+		CategoryID:  int64(rand.Intn(len(Categories)) + 1),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
+
 	_, err := store.InsertProject(ctx, arg)
 	return err
 }
@@ -93,21 +98,22 @@ func AddComment(store db.Queries, ctx context.Context, i int) error {
 		UserID:    int64(i),
 		ProjectID: int64(rID),
 		Date:      time.Now(),
-		Text:      fmt.Sprintf("this a random %d comment", i),
+		Text:      fmt.Sprintf("this is a random comment %d", i),
 	}
+
 	_, err := store.InsertComment(ctx, arg)
 	return err
 }
 
 func AddAssignProject(store db.Queries, ctx context.Context, i int) error {
 	rID := rand.Intn(i) + 1
-
 	arg := db.InsertAssignProjectParams{
 		UserID:    int64(i),
 		ProjectID: int64(rID),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+
 	_, err := store.InsertAssignProject(ctx, arg)
 	return err
 }
